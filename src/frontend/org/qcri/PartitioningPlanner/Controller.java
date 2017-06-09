@@ -82,7 +82,7 @@ public class Controller implements Runnable {
 	public Controller (Catalog catalog, HStoreConf hstore_conf, CatalogContext catalog_context){
 
 		ttExecutor = new TupleTrackerExecutor();
-		// connect to VoltDB server
+		// connect to VoltDB serve	r
 		client = ClientFactory.createClient();
 		client.configureBlocking(false);
 		sites = CatalogUtil.getAllSites(catalog);

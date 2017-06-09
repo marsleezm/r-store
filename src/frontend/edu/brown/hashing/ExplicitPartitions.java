@@ -2,6 +2,7 @@ package edu.brown.hashing;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import edu.brown.hstore.reconfiguration.ReconfigurationUtil;
 import edu.brown.logging.LoggerUtil;
 import edu.brown.logging.LoggerUtil.LoggerBoolean;
 import edu.brown.mappings.ParameterMappingsSet;
+import edu.brown.utils.FileUtil;
 
 public abstract class ExplicitPartitions {
 
@@ -62,6 +64,7 @@ public abstract class ExplicitPartitions {
     }
 	
 	protected ExplicitPartitions(CatalogContext catalog_context, JSONObject partition_json) throws Exception {
+		FileUtil.append_to_file(Paths.get("./twotier").toString(), " initing explicit partition\n");
 		this.catalog_context = catalog_context;
         this.catalog_to_table_map = new HashMap<>();
         this.table_partition_cols_map = new HashMap<>();
@@ -74,6 +77,7 @@ public abstract class ExplicitPartitions {
         // from project mapping (ae)
         assert partition_json.has(DEFAULT_TABLE) : "default_table missing from planned partition json";
         this.default_table = partition_json.getString(DEFAULT_TABLE);
+        FileUtil.append_to_file(Paths.get("./twotier").toString(), " adding database tables\n");
         for (Table table : catalog_context.getDataTables()) {
             if (table.getIsreplicated()) continue;
         	
@@ -104,6 +108,7 @@ public abstract class ExplicitPartitions {
             }
         }
 
+        FileUtil.append_to_file(Paths.get("./twotier").toString(), " adding procedure\n");
         for (Procedure proc : catalog_context.procedures) {
             if (!proc.getSystemproc()) {
             	Column[] cols = new Column[proc.getPartitioncolumns().size()];
@@ -141,16 +146,21 @@ public abstract class ExplicitPartitions {
 
             }
         }
+        
+        FileUtil.append_to_file(Paths.get("./twotier").toString(), " adding new tables\n");
         // We need to track which tables are partitioned on another table in
         // order to generate the reconfiguration ranges for those tables,
         // because they are not explicitly partitioned in the plan.
         DependencyUtil dependUtil = DependencyUtil.singleton(catalog_context.database);
         partitionedTablesByFK = new HashMap<>();
 
+        FileUtil.append_to_file(Paths.get("./twotier").toString(), " catalog database is "+catalog_context.getDataTables()+"\n");
+        
         for (Table table : catalog_context.getDataTables()) {
             String tableName = table.getName().toLowerCase();
             // Making the assumption that the same tables are in all plans TODO
             // verify this
+            FileUtil.append_to_file(Paths.get("./twotier").toString(), " table name is "+tableName+"\n");
             if (partitionedTables.contains(tableName) == false) {
 
                 Column[] partitionCols = this.table_partition_cols_map.get(tableName);
@@ -161,6 +171,7 @@ public abstract class ExplicitPartitions {
                     LOG.info(tableName + " is not explicitly partitioned.");
                 }
 
+                FileUtil.append_to_file(Paths.get("./twotier").toString(), tableName+"1\n");
                 List<Column> depCols = dependUtil.getAncestors(partitionCols[0]);
                 List<Table> parentCandidates = new ArrayList<>();
                 List<Table> prevParentCandidates = new ArrayList<>();
@@ -178,6 +189,7 @@ public abstract class ExplicitPartitions {
                         }
                     }
                 }
+                FileUtil.append_to_file(Paths.get("./twotier").toString(), tableName+"2\n");
                 
                 // find the parent with the greatest number of partition columns in common
                 for(int i = 1; i < partitionCols.length; i++) {
@@ -202,6 +214,7 @@ public abstract class ExplicitPartitions {
                         }
                     }
                 }
+                FileUtil.append_to_file(Paths.get("./twotier").toString(), tableName+"3\n");
                 
                 Table parentTbl = null;
                 if(parentCandidates.size() != 0) {
@@ -211,6 +224,7 @@ public abstract class ExplicitPartitions {
                 } else {
                 	throw new RuntimeException("No partitioned relationship found for table : " + tableName + " partitioned:" + partitionedTables.toString());
                 }
+                FileUtil.append_to_file(Paths.get("./twotier").toString(), tableName+"4\n");
                 
                 String parentTblName = parentTbl.getName().toLowerCase();
                 LOG.info("parent partitioned table for " + tableName + ": " + parentTbl + " : " + parentTblName);
@@ -223,8 +237,11 @@ public abstract class ExplicitPartitions {
                 	relatedTablesMap.get(parentTblName).add(parentTblName);
                 }
                 relatedTablesMap.get(parentTblName).add(tableName);
+                FileUtil.append_to_file(Paths.get("./twotier").toString(), tableName+"5\n");
             }
+            FileUtil.append_to_file(Paths.get("./twotier").toString(), " Finished table "+tableName+"\n");
         }
+       
 	}
 	
     /**

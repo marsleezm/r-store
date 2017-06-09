@@ -3,6 +3,7 @@
  */
 package edu.brown.hashing;
 
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +36,7 @@ import edu.brown.hstore.HStoreConstants;
 import edu.brown.hstore.conf.HStoreConf;
 import edu.brown.hstore.reconfiguration.ReconfigurationConstants;
 import edu.brown.hstore.reconfiguration.ReconfigurationUtil;
+import edu.brown.utils.FileUtil;
 
 /**
  * The delta between two partition plans
@@ -84,16 +86,19 @@ public class ReconfigurationPlan {
      * 
      */
     public ReconfigurationPlan(CatalogContext catalogContext, PartitionPhase old_phase,PartitionPhase new_phase) throws Exception {
+    	FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "reconfig6\n");
         this.catalogContext = catalogContext;
         outgoing_ranges = new HashMap<>();
         incoming_ranges = new HashMap<>();
         range_map = new HashMap<>();
         partitionedTablesByFK = old_phase.partitionedTablesByFK;
+        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "reconfig7\n");
         assert old_phase.tables_map.keySet().equals(new_phase.tables_map.keySet()) : "Partition plans have different tables";
         tables_map = new HashMap<String, ReconfigurationPlan.ReconfigurationTable>();
         for(String table_name : old_phase.tables_map.keySet()){
             tables_map.put(table_name, new ReconfigurationTable(catalogContext, old_phase.getTable(table_name), new_phase.getTable(table_name)));
         }
+        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "reconfig8\n");
         registerReconfigurationRanges();
         planDebug = String.format("Reconfiguration plan generated \n Out: %s \n In: %s",outgoing_ranges.toString(),incoming_ranges.toString());
         LOG.info(planDebug);

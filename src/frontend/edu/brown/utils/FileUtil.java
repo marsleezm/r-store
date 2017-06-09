@@ -26,6 +26,7 @@
 package edu.brown.utils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -33,6 +34,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -103,6 +105,19 @@ public abstract class FileUtil {
         }
         return (null);
 
+    }
+    
+    
+    //// MY IMPLEMENTATION FOR TESTING PURPOSE
+    public static void append_to_file(String file_name, String content){
+		try {
+			Writer output = new BufferedWriter(new FileWriter(file_name, true));
+			output.append(content);
+	    	output.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
     }
 
     /**

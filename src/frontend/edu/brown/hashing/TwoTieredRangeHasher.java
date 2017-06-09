@@ -5,6 +5,7 @@ package edu.brown.hashing;
 
 import org.json.JSONObject;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,6 +75,7 @@ public class TwoTieredRangeHasher extends DefaultHasher implements ExplicitHashe
      */
     public TwoTieredRangeHasher(CatalogContext catalogContext, int num_partitions, HStoreConf hstore_conf) {
         super(catalogContext, num_partitions,hstore_conf);
+        FileUtil.append_to_file(Paths.get("./twotier").toString(), " start\n");
         try {
             JSONObject partition_json = null;
             if(hstore_conf != null && hstore_conf.global.hasher_plan.equalsIgnoreCase(YCSB_TEST)){
@@ -81,12 +83,13 @@ public class TwoTieredRangeHasher extends DefaultHasher implements ExplicitHashe
                 partition_json = new JSONObject(ycsb_plan);
             } else if(hstore_conf != null && hstore_conf.global.hasher_plan != null){
                 LOG.info("Attempting to use partition plan at : " + hstore_conf.global.hasher_plan);
+                FileUtil.append_to_file(Paths.get("./twotier").toString(), " trying to use partition plan at : " + hstore_conf.global.hasher_plan);
                 partition_json = new JSONObject(FileUtil.readFile(hstore_conf.global.hasher_plan));
             } else {
                 LOG.error(" *** Using a two-tiered range hasher without a specified partition plan. Using YCSB default *** ");
                 partition_json = new JSONObject(ycsb_plan);
             }
-            
+            FileUtil.append_to_file(Paths.get("./twotier").toString(), " trying to get partitions\n");
             partitions = new TwoTieredRangePartitions(catalogContext, partition_json);
         } catch (Exception ex) {
             LOG.error("Error intializing partitions", ex);

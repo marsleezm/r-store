@@ -28,6 +28,7 @@ package edu.brown.hstore;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -138,6 +139,7 @@ import edu.brown.utils.ExceptionHandlingRunnable;
 import edu.brown.utils.PartitionEstimator;
 import edu.brown.utils.PartitionSet;
 import edu.brown.utils.StringUtil;
+import edu.brown.utils.FileUtil;
 import edu.brown.workload.Workload;
 
 /**
@@ -395,6 +397,8 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
      */
     private final PartitionSet local_partitions = new PartitionSet();
     
+    
+    private String file_name;
     /**
      * PartitionId -> Internal Offset
      * This is so that we don't have to keep long arrays of local partition information
@@ -445,12 +449,21 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         this.hstore_conf = hstore_conf;
         this.catalogContext = catalogContext;
         
+        // TODO: The config is HARD CODED!!!! Maybe should fix in the future
+        hstore_conf.global.reconfiguration_enable = true;
+        //hstore_conf.global.hasher_class = "edu.brown.hashing.TwoTieredRangeHasher";
+        //hstore_conf.global.hasher_class = "edu.brown.hashing.PlannedHasher";
+        hstore_conf.global.hasher_plan="scripts/reconfiguration/plans/tpcc-size100-18-fine.json";
+        
         this.catalog_site = this.catalogContext.getSiteById(site_id);
         if (this.catalog_site == null) throw new RuntimeException("Invalid site #" + site_id);
         
         this.catalog_host = this.catalog_site.getHost(); 
         this.site_id = this.catalog_site.getId();
         this.site_name = HStoreThreadManager.getThreadName(this.site_id, null);
+        
+        file_name = Paths.get("./hsite-").toString() +this.getSiteName();
+        FileUtil.append_to_file(file_name, " in func, hasher plan is "+hstore_conf.global.hasher_plan);
         
         final int num_partitions = this.catalogContext.numberOfPartitions;
         this.local_partitions.addAll(CatalogUtil.getLocalPartitionIds(catalog_site));
@@ -474,10 +487,12 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
             }
         }
         
-        LOG.info("Using hasher class: " + hstore_conf.global.hasher_class );     
+        LOG.info("Using hasher class: " + hstore_conf.global.hasher_class );
+        FileUtil.append_to_file(file_name, " before getting hasher");
         this.hasher = ClassUtil.newInstance(hstore_conf.global.hasher_class,
                                              new Object[]{ this.catalogContext, num_partitions , this.hstore_conf },
                                              new Class<?>[]{ CatalogContext.class, int.class, HStoreConf.class });
+        FileUtil.append_to_file(file_name, " got hasher");
         this.p_estimator = new PartitionEstimator(this.catalogContext, this.hasher);
         this.remoteTxnEstimator = new RemoteEstimator(this.p_estimator);
 
@@ -645,9 +660,11 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
      * This should only be called by our run() method
      */
     protected HStoreSite init() {
-        if (debug.val)
-            LOG.debug("Initializing HStoreSite " + this.getSiteName());
+        //if (debug.val)
+    	
+        LOG.info("Initializing HStoreSite " + this.getSiteName()+", global reconfig is "+hstore_conf.global.reconfiguration_enable);
         this.hstore_coordinator = this.initHStoreCoordinator();
+        FileUtil.append_to_file(file_name, "initizing, conf is "+hstore_conf.global.reconfiguration_enable);
         
         if(hstore_conf.global.reconfiguration_enable){
             LOG.info("Initializing Reconfiguration Coordinator");

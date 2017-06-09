@@ -5,6 +5,7 @@ package edu.brown.hashing;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,6 +93,7 @@ public class PlannedPartitions extends ExplicitPartitions implements JSONSeriali
                 String key = keys.next();
 
                 JSONObject phase = phases.getJSONObject(key);
+                FileUtil.append_to_file(Paths.get("./planned_hasher.txt").toString(), " partition adding  "+key+", "+phase+"\n");
                 this.partition_phase_map.put(key, new PartitionPhase(catalog_context, phase, partitionedTablesByFK));
 
                 // Use the first phase by default
@@ -766,22 +768,27 @@ public class PlannedPartitions extends ExplicitPartitions implements JSONSeriali
      * @return The delta between the plans or null if there is no change
      */
     public ReconfigurationPlan setPartitionPhase(String new_phase) {
+    	FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "partition1\n");
         String old_phase = this.current_phase;
         if (old_phase != null && old_phase.equals(new_phase)) {
             return null;
         }
+        FileUtil.append_to_file(Paths.get("./hasher.txt").toString(), "partition2\n");
         if (this.partition_phase_map.containsKey(new_phase) == false) {
             throw new RuntimeException("Invalid Phase Name: " + new_phase + " phases: " + StringUtil.join(",", this.partition_phase_map.keySet()));
         }
+        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "partition3\n");
         this.current_phase = new_phase;
         this.previous_phase = old_phase;
         this.incrementalPlan = null;
         this.previousIncrementalPlan = null;
         
+        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "partition4, old phase is "+old_phase+"\n");
         try {
             if (old_phase == null) {
                 return null;
             }
+            FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "partition5\n");
             return new ReconfigurationPlan(this.catalog_context, this.partition_phase_map.get(old_phase), this.partition_phase_map.get(new_phase));
         } catch (Exception ex) {
             LOG.error("Exception on setting partition phase", ex);

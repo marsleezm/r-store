@@ -3,6 +3,12 @@
  */
 package org.voltdb.sysprocs;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +62,7 @@ public class ReconfigurationRemote extends VoltSystemProcedure {
   @Override
   public DependencySet executePlanFragment(Long txn_id, Map<Integer, List<VoltTable>> dependencies, int fragmentId, ParameterSet params,
       SystemProcedureExecutionContext context) {
+	  System.out.println("Trying to execute plan fragment");
     DependencySet result = null;
     int coordinator = (int) params.toArray()[0];
     String partition_plan = (String) params.toArray()[1];
@@ -66,8 +73,11 @@ public class ReconfigurationRemote extends VoltSystemProcedure {
 
     case SysProcFragmentId.PF_reconfigurationRemoteDistribute: {
       try {
-        hstore_site.getReconfigurationCoordinator().initReconfiguration(coordinator, reconfig_protocol, partition_plan, currentPartitionId);
+    	  //System.out.println(str);
+    	  //append_to_file(Paths.get("./testout.txt").toString(), str+", "+hstore_site+", "+hstore_site.getReconfigurationCoordinator());
+    	  hstore_site.getReconfigurationCoordinator().initReconfiguration(coordinator, reconfig_protocol, partition_plan, currentPartitionId);
       } catch (Exception ex) {
+    	  append_to_file(Paths.get("./testout.txt").toString(), ex.getMessage());
         throw new ServerFaultException(ex.getMessage(), txn_id);
       }
 
@@ -105,6 +115,18 @@ public class ReconfigurationRemote extends VoltSystemProcedure {
     }
 
     return (result);
+  }
+  
+  //// MY IMPLEMENTATION FOR TESTING PURPOSE
+  private void append_to_file(String file_name, String content){
+		try {
+			Writer output = new BufferedWriter(new FileWriter(file_name, true));
+			output.append(content);
+	    	output.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
   }
 
   public VoltTable[] run(int coordinator, String partition_plan, String protocol) {

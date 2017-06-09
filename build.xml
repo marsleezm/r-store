@@ -2521,6 +2521,8 @@ UTILITIES
         <arg value="partitionplan.ignore_missing=${partitionplan.ignore_missing}" />
         <arg value="workload.output=${workload.output}" />
         <arg value="workload.procexclude=${benchmark.workload.ignore}" />
+        <arg value="global.reconfiguration_enable=true" />
+	<arg value="global.hasher_class=edu.brown.hashing.PlannedHasher" /> 
 
         &common;
 

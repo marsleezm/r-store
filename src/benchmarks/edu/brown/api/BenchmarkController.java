@@ -1866,6 +1866,7 @@ public class BenchmarkController {
         
         
         for (String arg : vargs) {
+        	//LOG.info("Param is "+arg);
             String[] parts = arg.split("=",2);
             for (int i = 0; i < parts.length; i++)
                 parts[1] = parts[1].trim();
@@ -2260,6 +2261,7 @@ public class BenchmarkController {
         Map<String, String> loadedArgs = hstore_conf.getParametersLoadedFromArgs(); 
         clientParams.putAll(loadedArgs);
         siteParams.putAll(loadedArgs);
+        LOG.info("Site param is "+siteParams);
         config.clientParameters.putAll(clientParams);
         config.siteParameters.putAll(siteParams);
         if (trace.val) LOG.trace("Benchmark Configuration\n" + config.toString());

@@ -2,6 +2,7 @@ package edu.brown.hstore.conf;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,6 +21,7 @@ import edu.brown.logging.LoggerUtil.LoggerBoolean;
 import edu.brown.utils.ArgumentsParser;
 import edu.brown.utils.ClassUtil;
 import edu.brown.utils.CollectionUtil;
+import edu.brown.utils.FileUtil;
 import edu.brown.utils.StringUtil;
 
 public final class HStoreConf {
@@ -2209,6 +2211,7 @@ public final class HStoreConf {
             
             // Configuration File
             if (args.hasParam(ArgumentsParser.PARAM_CONF)) {
+            	//FileUtil.append_to_file(Paths.get("./HStore").toString(), "loading from file "+args.getFileParam(ArgumentsParser.PARAM_CONF));
                 this.loadFromFile(args.getFileParam(ArgumentsParser.PARAM_CONF));
             }
             
@@ -2224,6 +2227,7 @@ public final class HStoreConf {
             
             Map<String, String> confParams = args.getHStoreConfParameters();
             if (confParams != null && confParams.isEmpty() == false) {
+            	//FileUtil.append_to_file(Paths.get("./HStore").toString(), " adding param "+confParams);
                 this.loadFromArgs(confParams);
             }
         }
@@ -2492,6 +2496,7 @@ public final class HStoreConf {
                 LOG.warn(String.format("Unexpected value type '%s' for property '%s'", f_class.getSimpleName(), f_name));
             }
             
+            //FileUtil.append_to_file(Paths.get("./LOAD").toString(), "loading from file "+f+", "+value);
             this.set(handle, f, value);
             this.markAsExternal(handle, f_name);
         } // FOR
@@ -2535,6 +2540,7 @@ public final class HStoreConf {
         for (Entry<String, String> e : args.entrySet()) {
             String k = e.getKey();
             String v = e.getValue();
+            //FileUtil.append_to_file(Paths.get("./HStore").toString(), " param is "+e);
             
             Matcher m = REGEX_PARSE.matcher(k);
             boolean found = m.matches();
@@ -2586,6 +2592,7 @@ public final class HStoreConf {
             if (debug.val) LOG.debug(String.format("CAST %s => %s", k, value));
            
             this.set(handle, f, value);
+            //FileUtil.append_to_file(Paths.get("./HStore").toString(), " Eventually adding "+handle+", f is "+f+", value is "+value);
             this.markAsExternal(handle, f_name);
         } // FOR
     }

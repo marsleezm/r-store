@@ -1,7 +1,12 @@
 package edu.brown.hstore.reconfiguration;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -287,17 +292,22 @@ public class ReconfigurationCoordinator implements Shutdownable {
      * @return the reconfiguration plan or null if plan already set
      */
     public ReconfigurationPlan initReconfiguration(Integer leaderId, ReconfigurationProtocols reconfigurationProtocol, String partitionPlan, int partitionId) {
-
+    	FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location1\n");
+    	
         if (this.reconfigurationInProgress.get() == false && partitionPlan == this.currentPartitionPlan) {
             LOG.info("Ignoring initReconfiguration request. Requested plan is already set");
             return null;
         }
+        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location2\n");
+        
         if ( !(reconfigurationProtocol == ReconfigurationProtocols.STOPCOPY ||  
                 reconfigurationProtocol == ReconfigurationProtocols.LIVEPULL ||
                 reconfigurationProtocol == ReconfigurationProtocols.REACTIVE ||
                 reconfigurationProtocol == ReconfigurationProtocols.NONOPT )) {
             throw new NotImplementedException();
         }
+        
+        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location3\n");
 
         if (reconfigurationProtocol == ReconfigurationProtocols.REACTIVE || reconfigurationProtocol == ReconfigurationProtocols.NONOPT){
             LOG.info("Disabling optimizations");
@@ -315,6 +325,8 @@ public class ReconfigurationCoordinator implements Shutdownable {
             hstore_conf.site.reconfig_pull_single_key = true;
             
         }
+        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location4\n");
+		
         // We may have reconfiguration initialized by PEs so need to ensure
         // atomic
         if (this.reconfigurationInProgress.compareAndSet(false, true)) {
@@ -333,6 +345,9 @@ public class ReconfigurationCoordinator implements Shutdownable {
             } else {
             	FileUtil.appendEventToFile("RECONFIG_INIT, siteId="+this.hstore_site.getSiteId());
             }
+            
+            FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location5\n");
+            
             this.reconfigurationLeader = leaderId;
             this.reconfigurationProtocol = reconfigurationProtocol;
             this.currentPartitionPlan = partitionPlan;
@@ -343,25 +358,29 @@ public class ReconfigurationCoordinator implements Shutdownable {
             } else if (absHasher instanceof PlannedHasher) {
                 hasher = (PlannedHasher) absHasher;
             } 
-            
+            FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location6\n");
             ReconfigurationPlan reconfig_plan;
             
             //Used by the leader to track the reconfiguration state of each partition and each site respectively 
             this.reconfigurationDonePartitionIds.clear();
             reconfigurationDoneSites.clear();
             
+            FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location7\n");
             try {
                 // Find reconfig plan
                 if (absHasher instanceof TwoTieredRangeHasher) {
+                	FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "TwoTierHash\n");
                     reconfig_plan = hasher.changePartitionPlan(partitionPlan);
                     for(PartitionExecutor executor : this.local_executors) {
                     	((TwoTieredRangeHasher) executor.getPartitionEstimator().getHasher()).changePartitionPlan(partitionPlan);
                     }
                 } else if (absHasher instanceof PlannedHasher) {
+                	FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "PLanner\n");
                     reconfig_plan = hasher.changePartitionPhase(partitionPlan);
                     for(PartitionExecutor executor : this.local_executors) {
                     	((PlannedHasher) executor.getPartitionEstimator().getHasher()).changePartitionPhase(partitionPlan);
                     }
+                    FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location9\n");
                 } else {
                     throw new Exception("Unsupported hasher : " + absHasher.getClass());
                 }
@@ -370,9 +389,11 @@ public class ReconfigurationCoordinator implements Shutdownable {
                 } else {
                     FileUtil.appendEventToFile("Null Reconfig plan");
                 }
+                FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location10\n");
                 this.planned_partitions = hasher.getPartitions();
                 if (reconfigurationProtocol == ReconfigurationProtocols.STOPCOPY) {
                     if (reconfig_plan != null){
+                    	FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location11\n");
                         LOG.info("initReconfig for STOPCOPY");
                         this.partitionStates.put(partitionId, ReconfigurationState.DATA_TRANSFER);
                         this.reconfigurationState = ReconfigurationState.DATA_TRANSFER;
@@ -393,6 +414,7 @@ public class ReconfigurationCoordinator implements Shutdownable {
                             queueManager.setRejectNewTxns(true);
                         }
 
+                        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location12\n");
                         //push outgoing ranges for all local PEs
                         //TODO remove this loop and schedule chunked pulls/ 
                         for (PartitionExecutor executor : this.local_executors) {
@@ -427,6 +449,7 @@ public class ReconfigurationCoordinator implements Shutdownable {
                         // Check here whether S&C has ended
                         // The checking is done by each partition based on whether they have processed
                         // all the scheduled async messages or not
+                        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location12\n");
                         boolean reconfigEnds = false;
                         while(!reconfigEnds){
                           reconfigEnds = true;
@@ -439,6 +462,7 @@ public class ReconfigurationCoordinator implements Shutdownable {
                           }
                         }
                         
+                        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location13\n");
                         // Halt processing and clear queues at each partition
                         for (PartitionExecutor executor : this.local_executors) {
                         	if(abortsEnabledForStopCopy){
@@ -447,14 +471,16 @@ public class ReconfigurationCoordinator implements Shutdownable {
                                }
                         }
                         
-
+                        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location14\n");
                         if(abortsEnabledForStopCopy){
                             queueManager.setRejectNewTxns(false);
                         }
                         //TODO this file is horrible and needs refactoring....
                         //we have an end, reset and finish reconfiguration...
+                        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location15\n");
                         endReconfiguration();
                         resetReconfigurationInProgress();
+                        FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location16\n");
                         long siteTime = System.currentTimeMillis() - siteStart;
                         String timeMsg = String.format("STOPCOPY for site %s took %s ms and send %s kb", this.hstore_site.getSiteId(), siteTime, siteKBSent);
                         LOG.info(timeMsg);
@@ -497,6 +523,8 @@ public class ReconfigurationCoordinator implements Shutdownable {
             LOG.info("Init reconfiguraiton complete");
             return reconfig_plan;
         } else {
+        	FileUtil.append_to_file(Paths.get("./testout.txt").toString(), "location5-2");
+        	
             // If the reconfig plan is null, but we are in progress we should
             // re-attempt to get it;
             int tries = 0;
@@ -516,6 +544,8 @@ public class ReconfigurationCoordinator implements Shutdownable {
             return this.currentReconfigurationPlan;
         }
     }
+    
+    
     
     public void reconfigurationSysProcTerminate(){
         LOG.info(" ## ** ReconfigurationSysProcTerminate");

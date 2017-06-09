@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -50,6 +51,7 @@ import edu.brown.markov.containers.MarkovGraphsContainerUtil;
 import edu.brown.markov.containers.MarkovGraphsContainer;
 import edu.brown.utils.ArgumentsParser;
 import edu.brown.utils.ClassUtil;
+import edu.brown.utils.FileUtil;
 import edu.brown.utils.PartitionEstimator;
 import edu.brown.utils.StringBoxUtil;
 import edu.brown.utils.ThreadUtil;
@@ -233,6 +235,8 @@ public abstract class HStore {
         );
         
         // HStoreSite Stuff
+        //FileUtil.append_to_file(Paths.get("./HStore").toString(), "args are "+args);
+        
         final int site_id = args.getIntParam(ArgumentsParser.PARAM_SITE_ID);
         Thread t = Thread.currentThread();
         t.setName(HStoreThreadManager.getThreadName(site_id, null, "main"));

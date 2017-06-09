@@ -5,6 +5,7 @@ package edu.brown.hashing;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -66,6 +67,7 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
 
     public TwoTieredRangePartitions(CatalogContext catalog_context, JSONObject partition_json) throws Exception {
     	super(catalog_context, partition_json);
+    	FileUtil.append_to_file(Paths.get("./twotier").toString(), " initing partition");
     	this.old_partition_plan = null;
         this.partition_plan = null;
         this.incrementalPlan = null;
@@ -73,6 +75,7 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
 
         if (partition_json.has(PARTITION_PLAN)) {
             JSONObject plan = partition_json.getJSONObject(PARTITION_PLAN);
+            FileUtil.append_to_file(Paths.get("./twotier").toString(), " adding partition plan");
             this.partition_plan = new PartitionPhase(catalog_context, plan, partitionedTablesByFK);
         } else {
             throw new JSONException(String.format("JSON file is missing key \"%s\". ", PARTITION_PLAN));

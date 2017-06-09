@@ -3,6 +3,7 @@
  */
 package edu.brown.hashing;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,6 +91,7 @@ public class PlannedHasher extends DefaultHasher implements ExplicitHasher {
      * @throws Exception
      */
     public ReconfigurationPlan changePartitionPhase(String partition_plan) throws Exception {
+    	FileUtil.append_to_file(Paths.get("./hasher.txt").toString(), "PLanner\n");
         return planned_partitions.setPartitionPhase(partition_plan);
     }
 
@@ -115,6 +117,7 @@ public class PlannedHasher extends DefaultHasher implements ExplicitHasher {
                 partition_json = new JSONObject(ycsb_plan);
             }
             
+            FileUtil.append_to_file(Paths.get("./planned_hasher.txt").toString(), "partitin json is "+partition_json+"\n");
             planned_partitions = new PlannedPartitions(catalogContext, partition_json);
         } catch (Exception ex) {
             LOG.error("Error intializing planned partitions", ex);
