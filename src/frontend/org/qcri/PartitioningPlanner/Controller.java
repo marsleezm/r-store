@@ -171,9 +171,10 @@ public class Controller implements Runnable {
 			//System.out.println("Essam Before: hotTuplesList size is " + hotTuplesList.size());
 			System.out.println("Starting tuple tracking");	
 
+			ShellTools.cmd("./liscripts/remove_files.sh");
 			ttExecutor.turnOnOff(time_window,client);	// turn on tuple tracking for time window of X seconds
 
-			
+			ShellTools.cmd("./liscripts/gather_system_stats.sh");
 			
 			// here we get top K
 			ttExecutor.getTopKPerPart(no_of_partitions,hotTuplesList);
