@@ -136,12 +136,12 @@ public class Controller implements Runnable {
 					doReconfiguration();
 					System.out.println("Waiting until reconfiguration has completed");
 					String ip = sites.iterator().next().getHost().getIpaddr();
-					String response = ShellTools.cmd("ssh " + ip + " grep RECONFIGURATION_END /home/mserafini/h-store/hevent.log");
+					String response = ShellTools.cmd("ssh " + ip + " grep RECONFIGURATION_END "+System.getProperty("user.dir")+"/hevent.log");
 //                    String response = ShellTools.cmd("ssh " + ip + " grep RECONFIGURATION_END /localdisk/rytaft/h-store/hevent.log");
 					int previousReconfigurations = response.split("\n").length; 
 					while(true){
 						Thread.sleep(1000);
-						response = ShellTools.cmd("ssh " + ip + " grep RECONFIGURATION_END /home/mserafini/h-store/hevent.log");
+						response = ShellTools.cmd("ssh " + ip + " grep RECONFIGURATION_END "+System.getProperty("user.dir")+"/hevent.log");
 //						response = ShellTools.cmd("ssh " + ip + " grep RECONFIGURATION_END /localdisk/rytaft/h-store/hevent.log");
 						if(response.split("\n").length > previousReconfigurations) break;
 					}
@@ -165,9 +165,6 @@ public class Controller implements Runnable {
 
 		ArrayList<Map<Long, Long>> hotTuplesList = new ArrayList<Map<Long, Long>> (no_of_partitions);
 
-
-
-
 		try {
 
 			//ttExecutor.runTestCase(); 	
@@ -190,7 +187,8 @@ public class Controller implements Runnable {
 
 			if(doProvisioning == 1)
 			{
-				System.out.println("Provisioning is on");	
+				System.out.println("Provisioning is on "+provisioning);	
+				CPUUtilPerPartitionMap = provisioning.getCPUUtilPerPartition();
 				int numberOfPartitions = provisioning.partitionsRequired(CPUUtilPerPartitionMap);
 				System.out.println("Provisioning requires " + numberOfPartitions + " partitions");
                 long before = System.currentTimeMillis();
@@ -274,7 +272,8 @@ public class Controller implements Runnable {
 		if(vargs.length == 0){
 			System.out.println("Must specify server hostname");
 			return;
-		}		
+		}
+		System.out.println(System.getProperty("user.dir"));
 
 		ArgumentsParser args = ArgumentsParser.load(vargs,ArgumentsParser.PARAM_CATALOG);
 

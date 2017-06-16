@@ -33,6 +33,9 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -72,6 +75,16 @@ public abstract class FileUtil {
             fullPath += p;
         } // FOR
         return new File(fullPath);
+    }
+    
+    public static void write(String content){
+    	try {
+			Files.write(Paths.get(System.getProperty("user.dir")+"/output"+Thread.currentThread().getName()), 
+					(content+System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     public static boolean exists(String path) {

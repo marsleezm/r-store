@@ -135,6 +135,7 @@ import edu.brown.utils.EventObservable;
 import edu.brown.utils.EventObservableExceptionHandler;
 import edu.brown.utils.EventObserver;
 import edu.brown.utils.ExceptionHandlingRunnable;
+import edu.brown.utils.FileUtil;
 import edu.brown.utils.PartitionEstimator;
 import edu.brown.utils.PartitionSet;
 import edu.brown.utils.StringUtil;
@@ -445,6 +446,11 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         this.hstore_conf = hstore_conf;
         this.catalogContext = catalogContext;
         
+	hstore_conf.global.reconfiguration_enable = true;
+	hstore_conf.global.hasher_class = "edu.brown.hashing.TwoTieredRangeHasher";
+	hstore_conf.global.hasher_plan = "ycsb.json";
+
+
         this.catalog_site = this.catalogContext.getSiteById(site_id);
         if (this.catalog_site == null) throw new RuntimeException("Invalid site #" + site_id);
         
@@ -512,6 +518,7 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         for (int partition : this.local_partitions) {
             this.local_partition_offsets[partition] = offset++;
         } // FOR
+        
         
         // -------------------------------
         // THREADS

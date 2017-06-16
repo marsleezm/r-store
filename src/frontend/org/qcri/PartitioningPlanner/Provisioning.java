@@ -61,7 +61,9 @@ public class Provisioning {
 	
 	public Map<Site,Map<Partition,Double>> getCPUUtilPerPartition() {
 		Map<Site,Map<Partition,Double>> CPUUtilPerPartitionMap = new HashMap<>();
+		System.out.println("Sites are "+sites.toString());	
 		for(Site site : sites){
+			System.out.println("Has site "+site);
 			if(site.getId() < (usedPartitions/PARTITIONS_PER_SITE)){
 				Map<Partition,Double> CPUUtilPerPartition = getCPUPerPartitionSsh(site);
 				CPUUtilPerPartitionMap.put(site, CPUUtilPerPartition);
@@ -76,15 +78,19 @@ public class Provisioning {
 	public int partitionsRequired(Map<Site,Map<Partition,Double>> CPUUtilPerPartitionMap){
 		double totalUtil = 0;
 
+		System.out.println("In beginning, CPUPMap is "+CPUUtilPerPartitionMap.keySet());
 		for(Site site : CPUUtilPerPartitionMap.keySet()){
+			System.out.println("Site is  "+site+", site id is "+site.getId());
 			if(site.getId() < (usedPartitions/PARTITIONS_PER_SITE)){
 				Map<Partition,Double> CPUUtilPerPartition = CPUUtilPerPartitionMap.get(site);
 				for(Double util : CPUUtilPerPartition.values()){
 					totalUtil += util;
 				}
 			}
+			System.out.println("Total util is "+totalUtil);
 		}
 
+		System.out.println("In beginning2");
 		double avgUtilPerPartition = totalUtil/usedPartitions;
 
 		if(avgUtilPerPartition > CPU_THRESHOLD_UP){
@@ -105,6 +111,7 @@ public class Provisioning {
 			}
 			return Math.max(newSites, 1) * PARTITIONS_PER_SITE;
 		}
+		System.out.println("In beginning3");
 		//		System.out.println("Provisioning returns " + usedSites + " sites");
 		return usedPartitions;
 	}
@@ -123,6 +130,7 @@ public class Provisioning {
 	// ======== THE FOLLOWING METHODS USE SSH AND PS TO GET CPU UTILIZATION =================
 
 	public static Map<Partition,Double> getCPUPerPartitionSsh(Site site){
+		System.out.println("Getting CPUPer part");
 		String ip = site.getHost().getIpaddr();
 		CatalogMap<Partition> partitions = site.getPartitions();
 		HashMap<Partition,Double> res = new HashMap<Partition,Double>();
@@ -131,16 +139,20 @@ public class Provisioning {
 			// TODO use an environment variable $HSTORE_HOME in the command. to be used when .bashrc becomes accessible
 			// TODO very system specific. it should parse all "lines" entries and find the one with "java"
 			// TODO should split the script into (i) one script that finds the PID of the threads per partition and (ii) one command that calls top and grep (from java)
-			String command = String.format("ssh -t -t %s /home/mserafini/h-store/scripts/partitioning/cpu_partition_monitor.sh %02d %03d 2> /dev/null", ip, site.getId(), part.getId());
-//          String command = String.format("ssh -t -t %s /localdisk/rytaft/h-store/scripts/partitioning/cpu_partition_monitor.sh %02d %03d", ip, site.getId(), part.getId());
+			String command = String.format("ssh -t -t %s "+System.getProperty("user.dir")+"/scripts/partitioning/cpu_partition_monitor.sh %02d %03d 2> /dev/null", ip, site.getId(), part.getId());
+//          String command = String.format("ssh -t -t %s /localdisk/rytaft/h-store/scripts/partitioning/cpu_partition_monitor.sh %02d %03d", ip, site.getId(), part.getId());//2> /dev/null
+			//System.out.println("Command is "+command);
 			String result = ShellTools.cmd(command);
-//			System.out.println("Result: " + result);
+			//System.out.println("Result: " + result);
 
 			String[] lines = result.split("\n");
-            String[] fields = lines[1].split("\\s+");
-//		for(int i = 0; i < fields.length; i++){
-//			System.out.println(fields[i]);
-//		}
+			//System.out.println("Lines0 is: " + lines[0]);
+			//System.out.println("Lines1 is: " + lines[1]);
+            String[] fields = lines[0].split("\\s+");
+            //for(int i = 0; i < fields.length; i++){
+            //	System.out.println(fields[i]);
+            //}
+            System.out.println("Field 8 is "+fields[8]);
             try{
                     res.put(part, Double.parseDouble(fields[8]));
             } catch(NumberFormatException e){

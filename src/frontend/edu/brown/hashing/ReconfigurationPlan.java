@@ -35,6 +35,7 @@ import edu.brown.hstore.HStoreConstants;
 import edu.brown.hstore.conf.HStoreConf;
 import edu.brown.hstore.reconfiguration.ReconfigurationConstants;
 import edu.brown.hstore.reconfiguration.ReconfigurationUtil;
+import edu.brown.utils.FileUtil;
 
 /**
  * The delta between two partition plans
@@ -84,18 +85,23 @@ public class ReconfigurationPlan {
      * 
      */
     public ReconfigurationPlan(CatalogContext catalogContext, PartitionPhase old_phase,PartitionPhase new_phase) throws Exception {
+    	//FileUtil.write("Init reconfiguration plan");
         this.catalogContext = catalogContext;
         outgoing_ranges = new HashMap<>();
         incoming_ranges = new HashMap<>();
         range_map = new HashMap<>();
         partitionedTablesByFK = old_phase.partitionedTablesByFK;
+        //FileUtil.write("Partitioned table by FK is "+partitionedTablesByFK.keySet()+", "+partitionedTablesByFK.values());
         assert old_phase.tables_map.keySet().equals(new_phase.tables_map.keySet()) : "Partition plans have different tables";
+        //FileUtil.write("Tables map are "+new_phase.tables_map.keySet());
         tables_map = new HashMap<String, ReconfigurationPlan.ReconfigurationTable>();
         for(String table_name : old_phase.tables_map.keySet()){
+        	//FileUtil.write("Putting "+table_name+", "+old_phase.getTable(table_name)+", "+new_phase.getTable(table_name));
             tables_map.put(table_name, new ReconfigurationTable(catalogContext, old_phase.getTable(table_name), new_phase.getTable(table_name)));
         }
         registerReconfigurationRanges();
         planDebug = String.format("Reconfiguration plan generated \n Out: %s \n In: %s",outgoing_ranges.toString(),incoming_ranges.toString());
+        //FileUtil.write("Finish initing plan");
         LOG.info(planDebug);
     }
     

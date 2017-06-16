@@ -30,6 +30,7 @@ import edu.brown.hashing.ReconfigurationPlan;
 import edu.brown.hashing.ReconfigurationPlan.ReconfigurationRange;
 import edu.brown.hashing.ReconfigurationPlan.ReconfigurationTable;
 import edu.brown.utils.CollectionUtil;
+import edu.brown.utils.FileUtil;
 
 public class ReconfigurationUtil {
     private static final Logger LOG = Logger.getLogger(ReconfigurationUtil.class);
@@ -99,7 +100,8 @@ public class ReconfigurationUtil {
     }
 
     public static List<ReconfigurationPlan> naiveSplitReconfigurationPlan(ReconfigurationPlan plan, int numberOfSplits){
-        //The list of partition pairs that exchange data
+    	////FileUtil.write("Trying to split plan! Num split is "+numberOfSplits);
+    	//The list of partition pairs that exchange data
         Set<ReconfigurationPair> migrationPairs = new HashSet<>();
         
         //How we are going to split up the pairs
@@ -109,7 +111,7 @@ public class ReconfigurationUtil {
         for(Entry<Integer, List<ReconfigurationRange>> entry : plan.getIncoming_ranges().entrySet()){
             Set<Integer> partitionsSendingData = new HashSet<>();
             for(ReconfigurationRange range : entry.getValue()){
-                partitionsSendingData.add(range.getOldPartition());
+            	partitionsSendingData.add(range.getOldPartition());
                 migrationPairs.add(new ReconfigurationPair(range.getOldPartition(), range.getNewPartition()));
             }
             LOG.info(String.format("Partition: %s is receiving data from :%s",entry.getKey(),StringUtils.join(partitionsSendingData, ",")));

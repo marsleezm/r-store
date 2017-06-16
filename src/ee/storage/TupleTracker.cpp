@@ -159,9 +159,9 @@ void TupleTrackerManager::insertTuple(int64_t txnId, std::string tableName, uint
 	//if(	tableName != "AREA_CODE_STATE" || tableName == "CONTESTANTS" ||tableName == "VOTES" || tableName == "V_VOTES_BY_CONTESTANT_NUMBER_STATE")
 
 	//for TPCC
-	if(	tableName != "WAREHOUSE")
+	//if(	tableName != "WAREHOUSE")
 
-		return; // tracks only partitioning key table.
+	//	return; // tracks only partitioning key table.
 	//*/
 
 

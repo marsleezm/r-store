@@ -6442,6 +6442,7 @@ public class PartitionExecutor implements Runnable, Configurable, Shutdownable {
             ReconfigurationState reconfig_state, ExplicitPartitions planned_partitions)
             throws Exception {
         // FIXME (ae) We need to check with Andy about concurrency issues here
+    	//FileUtl.write("Initing reconfiguration, my id is "+this.partitionId+", reconfig state is "+reconfig_state);
         LOG.info(String.format("PE %s InitReconfiguration plan  %s %s", this.partitionId, reconfig_protocol, reconfig_state));
         if (this.reconfig_plan != null) {
             String msg = "Reconfiguration plan already set. Current state: " + reconfig_state;
@@ -6457,6 +6458,8 @@ public class PartitionExecutor implements Runnable, Configurable, Shutdownable {
         this.inReconfiguration = true;
         this.outgoing_ranges = reconfig_plan.getOutgoing_ranges().get(this.partitionId);
         this.incoming_ranges = reconfig_plan.getIncoming_ranges().get(this.partitionId);
+        //FileUtl.write("Incoming ranges are "+incoming_ranges);
+        //FileUtl.write("Outgoing ranges are "+outgoing_ranges);
         this.reconfiguration_tracker = new ReconfigurationTracking(planned_partitions, reconfig_plan, this.partitionId);
         this.p_estimator.getHasher().inReconfiguration.set(true);
     	if(this.p_estimator.getHasher() instanceof ExplicitHasher) {

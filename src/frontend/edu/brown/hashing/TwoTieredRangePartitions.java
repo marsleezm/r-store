@@ -93,7 +93,9 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
                 JSONObject plan = partition_json.getJSONObject(PARTITION_PLAN);
                 Iterator<String> table_names = plan.getJSONObject(TABLES).keys();
                 while (table_names.hasNext()) {
-                	tables.add(table_names.next());
+                	String next = table_names.next();
+                	//FileUtl.write("Adding to table: "+next);
+                	tables.add(next);
                 }
                 
                 synchronized (this) {
@@ -245,14 +247,17 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
     @Override
     public ReconfigurationPlan setPartitionPlan(JSONObject partition_json) {
         try {
+        	//FileUtl.write("Try to set partition plan");
         	// check that the new tables match the old tables
         	getExplicitPartitionedTables(partition_json);
+        	//FileUtl.write("Got explicit table!");
         	
         	PartitionPhase new_plan = null;
             PartitionPhase old_plan = null;
         	// update the partition plan
             if (partition_json.has(PARTITION_PLAN)) {
                 JSONObject plan = partition_json.getJSONObject(PARTITION_PLAN);
+                //FileUtl.write("Got plan: "+plan.toString());
                 new_plan = new PartitionPhase(catalog_context, plan, partitionedTablesByFK);
                 synchronized (this) {
             		this.old_partition_plan = this.partition_plan;
@@ -268,6 +273,7 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
             if (old_plan == null) {
                 return null;
             }
+            //FileUtl.write("Finish setting partition plan");
             return new ReconfigurationPlan(this.catalog_context, old_plan, new_plan);
         } catch (Exception ex) {
             LOG.error("Exception on setting partition plan", ex);
@@ -303,6 +309,7 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
      */
     @Override
     public String toJSONString() {
+    	//FileUtl.write("To JSON String not implemented!!");
         throw new NotImplementedException();
     }
 
@@ -315,6 +322,7 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
      */
     @Override
     public void save(File output_path) throws IOException {
+    	//FileUtl.write("Save not implemented!!");
         throw new NotImplementedException();
 
     }
@@ -329,6 +337,7 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
      */
     @Override
     public void load(File input_path, Database catalog_db) throws IOException {
+    	//FileUtl.write("Load not implemented!!");
         throw new NotImplementedException();
 
     }
@@ -342,6 +351,7 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
      */
     @Override
     public void toJSON(JSONStringer stringer) throws JSONException {
+    	//FileUtl.write("ToJSON not implemented!!");
         throw new NotImplementedException();
     }
 
@@ -355,12 +365,14 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
      */
     @Override
     public void fromJSON(JSONObject json_object, Database catalog_db) throws JSONException {
+    	//FileUtl.write("FromJSON not implemented!!");
         throw new NotImplementedException();
 
     }
 
     @Override
     public ReconfigurationPlan setPartitionPhase(String new_phase) {
+    	//FileUtl.write("Set partition phase not implemented!!");
         throw new NotImplementedException();
     }
 

@@ -66,7 +66,7 @@ public class ReconfigurationRemote extends VoltSystemProcedure {
 
     case SysProcFragmentId.PF_reconfigurationRemoteDistribute: {
       try {
-        hstore_site.getReconfigurationCoordinator().initReconfiguration(coordinator, reconfig_protocol, partition_plan, currentPartitionId);
+    	  hstore_site.getReconfigurationCoordinator().initReconfiguration(coordinator, reconfig_protocol, partition_plan, currentPartitionId);
       } catch (Exception ex) {
         throw new ServerFaultException(ex.getMessage(), txn_id);
       }
@@ -103,7 +103,6 @@ public class ReconfigurationRemote extends VoltSystemProcedure {
       throw new ServerFaultException(msg, txn_id);
 
     }
-
     return (result);
   }
 

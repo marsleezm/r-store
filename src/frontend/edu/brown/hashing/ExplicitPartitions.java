@@ -36,6 +36,7 @@ import edu.brown.hstore.reconfiguration.ReconfigurationUtil;
 import edu.brown.logging.LoggerUtil;
 import edu.brown.logging.LoggerUtil.LoggerBoolean;
 import edu.brown.mappings.ParameterMappingsSet;
+import edu.brown.utils.FileUtil;
 
 public abstract class ExplicitPartitions {
 
