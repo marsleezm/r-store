@@ -37,6 +37,7 @@ import org.voltdb.CatalogContext;
 import org.voltdb.ProcedureProfiler;
 import org.voltdb.TheHashinator;
 import org.voltdb.catalog.Database;
+import edu.brown.utils.FileUtil;
 
 import edu.brown.hstore.conf.HStoreConf;
 import edu.brown.hstore.estimators.TransactionEstimator;
@@ -226,6 +227,7 @@ public abstract class HStore {
             LOG.warn("\n" + HStore.getAssertWarning());
         }
         
+	FileUtil.write("Before parser loader");
         ArgumentsParser args = ArgumentsParser.load(vargs,
             ArgumentsParser.PARAM_CATALOG,
             ArgumentsParser.PARAM_SITE_ID,
@@ -233,6 +235,7 @@ public abstract class HStore {
         );
         
         // HStoreSite Stuff
+	FileUtil.write("Before getting name");
         final int site_id = args.getIntParam(ArgumentsParser.PARAM_SITE_ID);
         Thread t = Thread.currentThread();
         t.setName(HStoreThreadManager.getThreadName(site_id, null, "main"));
@@ -241,6 +244,7 @@ public abstract class HStore {
         if (debug.val) 
             LOG.debug("HStoreConf Parameters:\n" + HStoreConf.singleton().toString(true));
         
+	FileUtil.write("Before initializing store");
         HStoreSite hstore_site = HStore.initialize(args.catalogContext, site_id, hstore_conf);
 
         // ----------------------------------------------------------------------------
@@ -255,6 +259,7 @@ public abstract class HStore {
             LOG.info("Enabled workload logging '" + tracePath + "'");
         }
         
+	FileUtil.write("Before setting threshold");
         if (args.thresholds != null) hstore_site.setThresholds(args.thresholds);
         
         // ----------------------------------------------------------------------------
