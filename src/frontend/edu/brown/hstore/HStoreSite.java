@@ -448,7 +448,6 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         
 	hstore_conf.global.reconfiguration_enable = true;
 	hstore_conf.global.hasher_class = "edu.brown.hashing.TwoTieredRangeHasher";
-	hstore_conf.global.hasher_plan = "ycsb.json";
 
 
         this.catalog_site = this.catalogContext.getSiteById(site_id);
