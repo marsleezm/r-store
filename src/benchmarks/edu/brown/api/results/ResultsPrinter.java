@@ -252,7 +252,7 @@ public class ResultsPrinter implements BenchmarkInterest {
         
         StringBuilder sb = new StringBuilder();
 	Date date = new Date();
-        nowTime = date.getTime();
+        long nowTime = date.getTime();
         sb.append(String.format("Now is %d, at time %d out of %d (%d%%):",
                                 nowTime, currentTime, duration, currentTime * 100 / duration));
         sb.append("\n" + SPACER);
