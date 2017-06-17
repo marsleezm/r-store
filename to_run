@@ -1,5 +1,5 @@
 ant compile && ant hstore-prepare -Dproject=ycsb -Dhosts=local_ycsb.txt
-ant hstore-benchmark -Dproject=ycsb
+ant hstore-benchmark -Dproject=ycsb -Dclient.hosts="172.31.0.3;172.31.0.6" -Dglobal.hasher_plan=ycsb_two.json
 
 
 ant elastic-controller -Dproject=ycsb -DtWindow=10 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=60000 -Dglobal.hasher_plan=ycsb.json -Dmonitoring=0 -DsitesPerHost=3 -DpartPerSite=4 -DlowCPU=110 -DhighCPU=160 | tee out_ycsb

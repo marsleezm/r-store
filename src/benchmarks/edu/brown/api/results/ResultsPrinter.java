@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.voltdb.utils.Pair;
@@ -250,8 +251,10 @@ public class ResultsPrinter implements BenchmarkInterest {
         long abort_unexpected = results.getResponseStatuses().get("ABORT_UNEXPECTED",0);
         
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("At time %d out of %d (%d%%):",
-                                currentTime, duration, currentTime * 100 / duration));
+	Date date = new Date();
+        nowTime = date.getTime();
+        sb.append(String.format("Now is %d, at time %d out of %d (%d%%):",
+                                nowTime, currentTime, duration, currentTime * 100 / duration));
         sb.append("\n" + SPACER);
         sb.append(String.format("In the past %d ms:",
                                 duration / pollCount));
