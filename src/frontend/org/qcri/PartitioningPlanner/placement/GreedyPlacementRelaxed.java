@@ -207,7 +207,7 @@ ArrayList<Map<Long, Long>>  clone(ArrayList<Map<Long, Long>> hotTuplesList) {
                             }
                         }
                         if(!placed) {
-                            dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount);
+                            dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount, false);
                         }
                         for(Plan.Range r : slice) { 
                             if(!aPlan.hasPartition(dstPartition)) {

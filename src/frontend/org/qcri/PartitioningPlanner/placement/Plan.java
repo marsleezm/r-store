@@ -28,7 +28,7 @@ public class Plan {
 
 		public String toString() {
 			String rangeStr = new String();
-			rangeStr = from.toString() + "-" + (to.toString() + 1);
+			rangeStr = from.toString() + "-" + new Long(to + 1).toString();
 			return rangeStr;
 		}
 
@@ -566,7 +566,7 @@ public class Plan {
 
 	private JSONObject traverseLevel(JSONObject srcData, String key) {
 		try {
-			System.out.println("Traversing JSON key " + key);
+			//System.out.println("Traversing JSON key " + key);
 			JSONObject child = srcData.getJSONObject(key);
 			return child;
 			//srcData = child;

@@ -75,7 +75,8 @@ public class Controller implements Runnable {
 	private static int partPerSite = 1;
 	private static double highCPU = 160;
 	private static double lowCPU = 110;
-
+	private static List<Integer> to_add_parts = new ArrayList<Integer>();
+	private static List<Integer> to_remove_parts = new ArrayList<Integer>();
 
 	// used HStoreTerminal as model to handle the catalog
 
@@ -94,7 +95,6 @@ public class Controller implements Runnable {
 			System.out.println("Must set global.hasher_plan to specify plan file!");
 			System.out.println("Using default (plan.json)");
 			planFile = FileSystems.getDefault().getPath("plan.json");
-
 		}
 		else{
 			planFile = FileSystems.getDefault().getPath(hstore_conf.global.hasher_plan);
@@ -194,7 +194,7 @@ public class Controller implements Runnable {
 				System.out.println("Provisioning requires " + numberOfPartitions + " partitions");
                 long before = System.currentTimeMillis();
 				currentPlan = algo.computePlan(hotTuplesList, mSiteLoad, planFile.toString(), 
-						numberOfPartitions, timeLimit, catalog_context);
+						numberOfPartitions, timeLimit, catalog_context, to_add_parts, to_remove_parts);
                 long after = System.currentTimeMillis();
                 System.out.println("The planner took " + (after-before) + " ms to find a new plan");
 				provisioning.setPartitions(numberOfPartitions);
@@ -205,7 +205,7 @@ public class Controller implements Runnable {
 				System.out.println("Provisioning is off");
                 long before = System.currentTimeMillis();
 				currentPlan = algo.computePlan(hotTuplesList, mSiteLoad, planFile.toString(), 
-						no_of_partitions, timeLimit, catalog_context);
+						no_of_partitions, timeLimit, catalog_context, to_add_parts, to_remove_parts);
                 long after = System.currentTimeMillis();
                 System.out.println("The planner took " + (after-before) + " ms to find a new plan");
 			}
@@ -297,6 +297,15 @@ public class Controller implements Runnable {
 			partPerSite = Integer.parseInt(vargs[8]);
 			highCPU = Double.parseDouble(vargs[9]);
 			lowCPU = Double.parseDouble(vargs[10]);
+			String[] to_change_parts = vargs[11].split(";");
+			for (String str : to_change_parts){
+				if(str.charAt(0) == '+')
+					to_add_parts.add(new Integer(str.substring(1)));
+				else
+					to_remove_parts.add(new Integer(str.substring(1)));
+			}
+			System.out.println("To add parts is "+to_add_parts);
+			System.out.println("To remove parts is "+to_remove_parts);
 		}
 		else // use default
 		{

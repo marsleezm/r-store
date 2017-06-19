@@ -57,7 +57,7 @@ public class GreedyPlacement extends Placement {
 			//System.out.println("Processing hot tuple id " + _hotTupleId + " with access count " + _hotAccessCount);
 
 			if(partitionTotals.get(_srcPartition) > meanAccesses || _srcPartition >= partitionCount) {
-					dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount);
+					dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount, false);
 					if(dstPartition != _srcPartition) {
 					        //System.out.println(" sending it to " + dstPartition);
 						partitionTotals.put(_srcPartition, partitionTotals.get(_srcPartition)  - _hotAccessCount);
@@ -94,7 +94,7 @@ public class GreedyPlacement extends Placement {
 							}
 						}
 						if(!placed) {
-							dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount);
+							dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount, false);
 						}
 						for(Plan.Range r : slice) { 
 							if(!aPlan.hasPartition(dstPartition)) {

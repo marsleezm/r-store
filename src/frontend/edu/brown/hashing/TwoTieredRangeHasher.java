@@ -54,7 +54,7 @@ public class TwoTieredRangeHasher extends DefaultHasher implements ExplicitHashe
      * @throws Exception
      */
     public ReconfigurationPlan changePartitionPlan(String partition_plan) throws Exception {
-    	//FileUtl.write("Trying to change partition plan with "+partition_plan);
+    	FileUtil.write("Trying to change partition plan with "+partition_plan);
     	try {
             if(partition_plan != null) {
             	JSONObject partition_json = new JSONObject(partition_plan);
@@ -83,6 +83,7 @@ public class TwoTieredRangeHasher extends DefaultHasher implements ExplicitHashe
                 partition_json = new JSONObject(ycsb_plan);
             } else if(hstore_conf != null && hstore_conf.global.hasher_plan != null){
                 LOG.info("Attempting to use partition plan at : " + hstore_conf.global.hasher_plan);
+                //FileUtil.write("Attempting to use partition plan at : " + hstore_conf.global.hasher_plan);
                 partition_json = new JSONObject(FileUtil.readFile(hstore_conf.global.hasher_plan));
             } else {
                 LOG.error(" *** Using a two-tiered range hasher without a specified partition plan. Using YCSB default *** ");

@@ -71,13 +71,14 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
         this.incrementalPlan = null;
         this.previousIncrementalPlan = null;
 
+        FileUtil.write("Before initing partition phase");
         if (partition_json.has(PARTITION_PLAN)) {
             JSONObject plan = partition_json.getJSONObject(PARTITION_PLAN);
             this.partition_plan = new PartitionPhase(catalog_context, plan, partitionedTablesByFK);
         } else {
             throw new JSONException(String.format("JSON file is missing key \"%s\". ", PARTITION_PLAN));
         }
-
+        FileUtil.write("After initing partition phase");
         // TODO check to make sure partitions exist that are in the plan (ae)
 
     }
@@ -247,10 +248,10 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
     @Override
     public ReconfigurationPlan setPartitionPlan(JSONObject partition_json) {
         try {
-        	//FileUtl.write("Try to set partition plan");
+        	FileUtil.write("Try to set partition plan");
         	// check that the new tables match the old tables
         	getExplicitPartitionedTables(partition_json);
-        	//FileUtl.write("Got explicit table!");
+        	FileUtil.write("Got explicit table!");
         	
         	PartitionPhase new_plan = null;
             PartitionPhase old_plan = null;
@@ -273,7 +274,7 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
             if (old_plan == null) {
                 return null;
             }
-            //FileUtl.write("Finish setting partition plan");
+            FileUtil.write("Finish setting partition plan");
             return new ReconfigurationPlan(this.catalog_context, old_plan, new_plan);
         } catch (Exception ex) {
             LOG.error("Exception on setting partition plan", ex);

@@ -69,7 +69,7 @@ public class GreedyExtendedOneTieredPlacement extends Placement {
 					for(List<Plan.Range> slice : partitionSlices) {  // for each slice
 						for(Plan.Range r : slice) { 
 							Integer newWeight = (int) (tupleWeight *  ((double) Plan.getRangeWidth(r)));
-							dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount);
+							dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount, false);
 							
 							if((partitionTotals.get(i) > meanAccesses || i.intValue() >= partitionCount) && i != dstPartition) { 		
 								

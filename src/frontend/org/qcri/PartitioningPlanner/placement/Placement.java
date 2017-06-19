@@ -31,15 +31,17 @@ public class Placement {
 	// siteLoads: partitionId --> total access count
 	// partitionCount: number of partitions actually in use
 	// timeLimit - time limit for planner in ms
-	public Plan computePlan(ArrayList<Map<Long, Long>> hotTuplesList, Map<Integer, Long> siteLoads, String planFile, int partitionCount, int timeLimit, CatalogContext catalogContext){
+	// The last parameters designate the partitions to add and remove. Currently only implemented for GreedyExtended Algorithm.
+	public Plan computePlan(ArrayList<Map<Long, Long>> hotTuplesList, Map<Integer, Long> siteLoads, String planFile, int partitionCount, int timeLimit, CatalogContext catalogContext,
+			List<Integer> toAddParts, List<Integer> toRemoveParts){
 		return new Plan(planFile);
 	}
 	
-	Integer getMostUnderloadedPartitionId(Map<Integer, Long> partitionTotals, int partitionCount) {
-		return getMostUnderloadedPartitionId(partitionTotals, partitionCount, false);
+	Integer getMostUnderloadedPartitionId(Map<Integer, Long> partitionTotals, int partitionCount, boolean filterBySite) {
+		return getMostUnderloadedPartitionId(partitionTotals, partitionCount, filterBySite, new HashSet<Integer>());
 	}
 	
-	Integer getMostUnderloadedPartitionId(Map<Integer, Long> partitionTotals, int partitionCount, boolean filterBySite) {
+	Integer getMostUnderloadedPartitionId(Map<Integer, Long> partitionTotals, int partitionCount, boolean filterBySite, Set<Integer> emptyParts) {
 		Long minTotal = java.lang.Long.MAX_VALUE; 
 		Integer minPartition = -1;
 
@@ -49,12 +51,13 @@ public class Placement {
 		}
 		
 		for(Integer i : partitionTotals.keySet()) {
-			if((!filterBySite || i / this.partPerSite == minSite) && 
-					i < partitionCount && partitionTotals.get(i) < minTotal) {
-				minPartition = i;
-				minTotal = partitionTotals.get(i);
+			if(!emptyParts.contains(i)){
+				if((!filterBySite || i / this.partPerSite == minSite) && 
+						i < partitionCount && partitionTotals.get(i) < minTotal) {
+					minPartition = i;
+					minTotal = partitionTotals.get(i);
+				}
 			}
-			
 		}
 		
 		return minPartition;

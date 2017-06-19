@@ -73,7 +73,7 @@ public class FirstFitPlacement extends Placement {
 				} // end inner-for
 			
 				if(!placed) {
-					dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount);
+					dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount, false);
 				}		
 			
 				//System.out.println("Processing hot tuple id " + _hotTupleId + " with access count " + _hotAccessCount + " sending it to " + dstPartition);
@@ -108,7 +108,7 @@ public class FirstFitPlacement extends Placement {
 							}
 						}
 						if(!placed) {
-							dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount);
+							dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount, false);
 						}
 						for(Plan.Range r : slice) { 
 							if(!newPlan.hasPartition(dstPartition)) {

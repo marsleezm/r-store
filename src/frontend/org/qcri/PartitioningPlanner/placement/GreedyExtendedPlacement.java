@@ -3,8 +3,10 @@ package org.qcri.PartitioningPlanner.placement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.qcri.PartitioningPlanner.placement.Plan;
 import org.voltdb.CatalogContext;
@@ -21,7 +23,8 @@ public class GreedyExtendedPlacement extends Placement {
 	
 	// hotTuples: tupleId --> access count
 	// siteLoads: partitionId --> total access count
-	public Plan computePlan(ArrayList<Map<Long, Long>> hotTuplesList, Map<Integer, Long> partitionTotals, String planFilename, int partitionCount, int timeLimit, CatalogContext catalogContext){
+	public Plan computePlan(ArrayList<Map<Long, Long>> hotTuplesList, Map<Integer, Long> partitionTotals, String planFilename, int partitionCount, int timeLimit, CatalogContext catalogContext,
+			List<Integer> toAddPartitions, List<Integer> toRemovePartitions){
 		
 		Integer dstPartition = -1;
 		Long totalAccesses = 0L;
@@ -29,10 +32,43 @@ public class GreedyExtendedPlacement extends Placement {
 		Long hotTupleCount = 0L;
 		
 		Plan aPlan = new Plan(planFilename);
+		
+		Set<Integer> empty_parts = new HashSet<Integer>();
+		Map<Integer, List<Plan.Range>> ranges = aPlan.getAllRanges();
+		for(Integer i : ranges.keySet()) {
+			List<Plan.Range> partitionRanges = ranges.get(i);
+			String range_str="";
+			for(Plan.Range range : partitionRanges) {
+				range_str += range.from+"-"+range.to;
+			}
+			if(range_str == "")
+				empty_parts.add(i);
+			System.out.println("For partition "+i+", range is "+range_str);
+		}
+		System.out.println("Empty partitions are "+empty_parts);
+		for(Integer part : toRemovePartitions){
+			if(empty_parts.contains(part)){
+				System.out.println("ERROR: to remove partition "+part+" should not be in empty partition! Exiting...");
+				System.exit(0);
+			}
+			else
+				empty_parts.add(part);
+		}
+		for(Integer part : toAddPartitions){
+			if(!empty_parts.contains(part)){
+				System.out.println("ERROR: to add partition "+part+" is not in empty partitions! Exiting...");
+				System.exit(0);
+			}
+			else
+				empty_parts.remove(part);
+		}
+		
+		
+		System.out.println("After adding and removing, final set of empty partitions are "+empty_parts.toString());
 
 		for(int i = 0; i < partitionCount; ++i) {
 		    if(partitionTotals.get(i) == null) {
-			partitionTotals.put(i, 0L);
+		    	partitionTotals.put(i, 0L);
 		    }
 		}
 		
@@ -45,7 +81,7 @@ public class GreedyExtendedPlacement extends Placement {
 		
 		// copy aPlan into oldPlan
 		Plan oldPlan = new Plan();
-		Map<Integer, List<Plan.Range>> ranges = aPlan.getAllRanges();
+		//Map<Integer, List<Plan.Range>> ranges = aPlan.getAllRanges();
 		for(Integer i : ranges.keySet()) {
 			List<Plan.Range> partitionRanges = ranges.get(i);
 			oldPlan.addPartition(i);
@@ -81,12 +117,12 @@ public class GreedyExtendedPlacement extends Placement {
 		
 		for(Long i = 0L; i < hotTupleCount; ++i) {
 			getHottestTuple(hotTuplesList);
-			System.out.println("Processing hot tuple id " + _hotTupleId + " with access count " + _hotAccessCount);
+			//System.out.println("Processing hot tuple id " + _hotTupleId + " with access count " + _hotAccessCount);
 
-			if(partitionTotals.get(_srcPartition) > meanAccesses || _srcPartition >= partitionCount) {
-					dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount);
+			if(empty_parts.contains(_srcPartition) || partitionTotals.get(_srcPartition) > meanAccesses || _srcPartition >= partitionCount) {
+					dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount, false, empty_parts);
 					if(dstPartition != _srcPartition) {
-					    System.out.println(" sending it from"+_srcPartition+" to " + dstPartition);
+					    //System.out.println(" sending it from "+_srcPartition+" to " + dstPartition);
 						partitionTotals.put(_srcPartition, partitionTotals.get(_srcPartition)  - _hotAccessCount);
 						partitionTotals.put(dstPartition,partitionTotals.get(dstPartition)  + _hotAccessCount);
 						aPlan.removeTupleId(_srcPartition, _hotTupleId);
@@ -100,19 +136,24 @@ public class GreedyExtendedPlacement extends Placement {
 
 		}
 		
+		System.out.println("Start doing cold partition");
 		// place the cold tuples from the overloaded or deleted partitions
 		for(Integer i : oldPlan.getAllRanges().keySet()) { // foreach partition
-			if(partitionTotals.get(i) > meanAccesses || i.intValue() >= partitionCount) { 
+			System.out.println("Trying partition "+i);
+			if(empty_parts.contains(i) || partitionTotals.get(i) > meanAccesses) { 
+				//System.out.println("Moving cold parts for partition "+i);
 				List<List<Plan.Range>> partitionSlices = oldPlan.getRangeSlices(i,  coldPartitionWidth);
+				//System.out.println("Got partition slice for "+i);
 				if(partitionSlices.size() > 0) {
+					//System.out.println("Slice size is "+partitionSlices.size());
 					Double tupleWeight = ((double) oldLoad.get(i)) / oldPlan.getTupleCount(i); // per tuple
 
 					for(List<Plan.Range> slice : partitionSlices) {  // for each slice
 						for(Plan.Range r : slice) { 
 							Integer newWeight = (int) (tupleWeight *  ((double) Plan.getRangeWidth(r)));
-							dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount);
+							dstPartition = getMostUnderloadedPartitionId(partitionTotals, partitionCount, false, empty_parts);
 							
-							if((partitionTotals.get(i) > meanAccesses || i.intValue() >= partitionCount) && i != dstPartition) { 		
+							if(( empty_parts.contains(i) || partitionTotals.get(i) > meanAccesses) && i != dstPartition) { 		
 								
 								List<Plan.Range> oldRanges = aPlan.getRangeValues(i, r.from, r.to);
 								for(Plan.Range oldRange : oldRanges) {
@@ -142,7 +183,8 @@ public class GreedyExtendedPlacement extends Placement {
 		if(!catalogContext.jarPath.getName().contains("tpcc")) {
 			aPlan = demoteTuples(hotTuplesListCopy, aPlan);
 		}
-		removeEmptyPartitions(aPlan);
+		//removeEmptyPartitions(aPlan);
+		//replaceEmptyPartitions(aPlan);
 		return aPlan;
 		
 	}

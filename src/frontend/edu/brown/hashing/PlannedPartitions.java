@@ -310,9 +310,11 @@ public class PlannedPartitions extends ExplicitPartitions implements JSONSeriali
             assert (phase.has(TABLES));
             JSONObject json_tables = phase.getJSONObject(TABLES);
             Iterator<String> table_names = json_tables.keys();
+       
             while (table_names.hasNext()) {
                 String table_name = table_names.next();
                 JSONObject table_json = json_tables.getJSONObject(table_name.toLowerCase());
+                //FileUtil.write("Table Json is "+table_json);
                 // Class<?> c = table_vt_map.get(table_name).classFromType();
                 // TODO fix partitiontype
                 this.tables_map.put(table_name, new PartitionedTable(table_name, table_json, catalog_context.getTableByName(table_name)));
@@ -320,11 +322,13 @@ public class PlannedPartitions extends ExplicitPartitions implements JSONSeriali
 
             // Add entries for tables that are partitioned on other columns
             for (Entry<String, String> partitionedFK : partitionedTablesByFK.entrySet()) {
+            	FileUtil.write("PartitionFk is "+partitionedFK);
                 String table_name = partitionedFK.getKey();
                 String fk_table_name = partitionedFK.getValue();
                 if (json_tables.has(fk_table_name) == false) {
                     throw new RuntimeException(String.format("For table %s, the foreignkey partitioned table %s is not explicitly partitioned ", table_name, fk_table_name));
                 }
+                FileUtil.write(String.format("Adding FK partitioning %s->%s", table_name, fk_table_name));
                 LOG.info(String.format("Adding FK partitioning %s->%s", table_name, fk_table_name));
                 this.tables_map.put(partitionedFK.getKey(), this.tables_map.get(partitionedFK.getValue()).clone(table_name, catalog_context.getTableByName(table_name)));
             }
@@ -370,6 +374,7 @@ public class PlannedPartitions extends ExplicitPartitions implements JSONSeriali
         private LRUMap find_partition_cache;
 
         public PartitionedTable(String table_name, JSONObject table_json, Table catalog_table) throws Exception {
+            //FileUtil.write("In partitioned table");
             this.catalog_table = catalog_table;
             this.partitions = new ArrayList<>();
             this.table_name = table_name;
@@ -377,13 +382,16 @@ public class PlannedPartitions extends ExplicitPartitions implements JSONSeriali
             this.find_partition_cache = new LRUMap(1000);
             assert (table_json.has(PARTITIONS));
             JSONObject partitions_json = table_json.getJSONObject(PARTITIONS);
+            //FileUtil.write("partitions json is "+partitions_json);
             Iterator<String> partitions = partitions_json.keys();
             while (partitions.hasNext()) {
                 String partition = partitions.next();
+                
                 // TODO do we need more than ints, what about specifying ranges
                 // as
                 // replicated tables (ae)
                 int partition_id = Integer.parseInt(partition);
+                //FileUtil.write("partition is "+partition);
                 this.addPartitionRanges(partition_id, partitions_json.getString(partition));
             }
             Collections.sort(this.partitions);
@@ -491,9 +499,13 @@ public class PlannedPartitions extends ExplicitPartitions implements JSONSeriali
             synchronized (this) {
                 this.find_partition_cache.clear();   
             }
+            FileUtil.write("Partition is "+partition_id+", values are "+partition_values);
             for (String range : partition_values.split(",")) {
-                this.partitions.add(new PartitionRange(this.catalog_table, partition_id, range));
+            	//FileUtil.write("Range is "+range+" is range nothing? "+range.equals(""));
+                if (!range.equals(""))
+                    this.partitions.add(new PartitionRange(this.catalog_table, partition_id, range));
             }
+            //FileUtil.write("Added partition range");
         }
 
         public List<PartitionRange> getRanges() {
