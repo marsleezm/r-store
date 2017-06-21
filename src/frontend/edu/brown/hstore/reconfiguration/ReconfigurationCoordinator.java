@@ -291,7 +291,7 @@ public class ReconfigurationCoordinator implements Shutdownable {
     public ReconfigurationPlan initReconfiguration(Integer leaderId, ReconfigurationProtocols reconfigurationProtocol, String partitionPlan, int partitionId) {
     	Date date = new Date();
     	start_time = date.getTime();
-    	FileUtil.write("Starting reconfiguration, time: "+ start_time);
+    	FileUtil.write_to_file("reconfig_output", "Starting reconfiguration, time: "+ start_time);
     	//Make sure that no reconfiguration is going on && the recongiruation protocol is implemented
         if (this.reconfigurationInProgress.get() == false && partitionPlan == this.currentPartitionPlan) {
             LOG.info("Ignoring initReconfiguration request. Requested plan is already set");
@@ -690,8 +690,8 @@ public class ReconfigurationCoordinator implements Shutdownable {
         if(reconfigurationDoneSites.size() == num_of_sites){
         	Date date =new Date();
         	long end_time = date.getTime();
-        	FileUtil.write("Reconfiguration is done! Time is :"+end_time);
-        	FileUtil.write("Duration is : "+(end_time-start_time));
+        	FileUtil.write_to_file("reconfig_output", "Reconfiguration is done! Time is :"+end_time);
+        	FileUtil.write_to_file("reconfig_output", "Duration is : "+(end_time-start_time));
         	sendReconfigEndAcknowledgementToAllSites();
             if (hasNextReconfigPlan()){
                 LOG.info(" @@@@@@@@@@@@@   Moving to next plan. Leader received all notifications (it was last) and another plan is scheduled");

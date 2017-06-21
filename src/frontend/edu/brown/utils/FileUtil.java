@@ -79,12 +79,22 @@ public abstract class FileUtil {
     
     public static void write(String content){
     	try {
-			Files.write(Paths.get(System.getProperty("user.dir")+"/output"+Thread.currentThread().getName()), 
-					(content+System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	    Files.write(Paths.get(System.getProperty("user.dir")+"/output"+Thread.currentThread().getName()), 
+		(content+System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+	    } catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+        }
+    }
+
+    public static void write_to_file(String file_name, String content){
+    	try {
+	    Files.write(Paths.get(System.getProperty("user.dir")+"/"+file_name), 
+		(content+System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+	    } catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+        }
     }
     
     public static boolean exists(String path) {

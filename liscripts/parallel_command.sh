@@ -6,7 +6,7 @@ FAIL=0
 if [ $# -eq 2 ]
 then
     nodes=$1
-    command="$2"
+    command=$2
 else
     nodes=`cat ./nodes`
     command=$1
@@ -14,7 +14,7 @@ fi
 echo $command" for nodes:"$nodes 
 for node in $nodes
 do
-    ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -t ubuntu@$node ${command/localhost/$node} &
+    ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -t ubuntu@$node $command &
 done
 echo $command done
 

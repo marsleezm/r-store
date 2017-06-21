@@ -248,10 +248,10 @@ public class TwoTieredRangePartitions extends ExplicitPartitions implements JSON
     @Override
     public ReconfigurationPlan setPartitionPlan(JSONObject partition_json) {
         try {
-        	FileUtil.write("Try to set partition plan");
+        	//FileUtil.write("Try to set partition plan");
         	// check that the new tables match the old tables
         	getExplicitPartitionedTables(partition_json);
-        	FileUtil.write("Got explicit table!");
+        	//FileUtil.write("Got explicit table!");
         	
         	PartitionPhase new_plan = null;
             PartitionPhase old_plan = null;

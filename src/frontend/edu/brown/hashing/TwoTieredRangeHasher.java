@@ -54,7 +54,7 @@ public class TwoTieredRangeHasher extends DefaultHasher implements ExplicitHashe
      * @throws Exception
      */
     public ReconfigurationPlan changePartitionPlan(String partition_plan) throws Exception {
-    	FileUtil.write("Trying to change partition plan with "+partition_plan);
+    	//FileUtil.write("Trying to change partition plan with "+partition_plan);
     	try {
             if(partition_plan != null) {
             	JSONObject partition_json = new JSONObject(partition_plan);
