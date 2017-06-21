@@ -322,13 +322,13 @@ public class PlannedPartitions extends ExplicitPartitions implements JSONSeriali
 
             // Add entries for tables that are partitioned on other columns
             for (Entry<String, String> partitionedFK : partitionedTablesByFK.entrySet()) {
-            	FileUtil.write("PartitionFk is "+partitionedFK);
+            	//FileUtil.write("PartitionFk is "+partitionedFK);
                 String table_name = partitionedFK.getKey();
                 String fk_table_name = partitionedFK.getValue();
                 if (json_tables.has(fk_table_name) == false) {
                     throw new RuntimeException(String.format("For table %s, the foreignkey partitioned table %s is not explicitly partitioned ", table_name, fk_table_name));
                 }
-                FileUtil.write(String.format("Adding FK partitioning %s->%s", table_name, fk_table_name));
+                //FileUtil.write(String.format("Adding FK partitioning %s->%s", table_name, fk_table_name));
                 LOG.info(String.format("Adding FK partitioning %s->%s", table_name, fk_table_name));
                 this.tables_map.put(partitionedFK.getKey(), this.tables_map.get(partitionedFK.getValue()).clone(table_name, catalog_context.getTableByName(table_name)));
             }
@@ -499,7 +499,7 @@ public class PlannedPartitions extends ExplicitPartitions implements JSONSeriali
             synchronized (this) {
                 this.find_partition_cache.clear();   
             }
-            FileUtil.write("Partition is "+partition_id+", values are "+partition_values);
+            //FileUtil.write("Partition is "+partition_id+", values are "+partition_values);
             for (String range : partition_values.split(",")) {
             	//FileUtil.write("Range is "+range+" is range nothing? "+range.equals(""));
                 if (!range.equals(""))
