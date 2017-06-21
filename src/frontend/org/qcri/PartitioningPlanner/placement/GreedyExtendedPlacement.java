@@ -45,21 +45,25 @@ public class GreedyExtendedPlacement extends Placement {
 				empty_parts.add(i);
 			System.out.println("For partition "+i+", range is "+range_str);
 		}
+		for (int i = 0; i<partitionCount; ++i){
+			if (ranges.keySet().contains(i) == false)
+				empty_parts.add(i);
+		}
 		System.out.println("Empty partitions are "+empty_parts);
 		for(Integer part : toRemovePartitions){
-			if(empty_parts.contains(part)){
-				System.out.println("ERROR: to remove partition "+part+" should not be in empty partition! Exiting...");
-				System.exit(0);
-			}
-			else
+			//if(empty_parts.contains(part)){
+			//	System.out.println("ERROR: to remove partition "+part+" should not be in empty partition! Exiting...");
+			//	System.exit(0);
+			//}
+			//else
 				empty_parts.add(part);
 		}
 		for(Integer part : toAddPartitions){
-			if(!empty_parts.contains(part)){
-				System.out.println("ERROR: to add partition "+part+" is not in empty partitions! Exiting...");
-				System.exit(0);
-			}
-			else
+			//if(!empty_parts.contains(part)){
+			//	System.out.println("ERROR: to add partition "+part+" is not in empty partitions! Exiting...");
+			//	System.exit(0);
+			//}
+			//else
 				empty_parts.remove(part);
 		}
 		
@@ -183,7 +187,7 @@ public class GreedyExtendedPlacement extends Placement {
 		if(!catalogContext.jarPath.getName().contains("tpcc")) {
 			aPlan = demoteTuples(hotTuplesListCopy, aPlan);
 		}
-		//removeEmptyPartitions(aPlan);
+		removeEmptyPartitions(aPlan);
 		//replaceEmptyPartitions(aPlan);
 		return aPlan;
 		
