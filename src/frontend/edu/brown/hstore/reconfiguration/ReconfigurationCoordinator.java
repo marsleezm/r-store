@@ -787,8 +787,8 @@ public class ReconfigurationCoordinator implements Shutdownable {
             // Now the leader can be sure that the reconfiguration is done as all sites have checked in
         	Date date =new Date();
         	long end_time = date.getTime();
-        	FileUtil.write("Reconfiguration is done! Time is :"+end_time);
-        	FileUtil.write("Duration is : "+(end_time-start_time));
+        	FileUtil.write_to_file("reconfig_output", "Reconfiguration is done! Time is :"+end_time);
+        	FileUtil.write_to_file("reconfig_output", "Duration is : "+(end_time-start_time));
         	
         	sendReconfigEndAcknowledgementToAllSites();
             if (hasNextReconfigPlan()){
