@@ -70,11 +70,11 @@ public class GreedyExtendedPlacement extends Placement {
 		
 		System.out.println("After adding and removing, final set of empty partitions are "+empty_parts.toString());
 
-		for(int i = 0; i < partitionCount; ++i) {
-		    if(partitionTotals.get(i) == null) {
-		    	partitionTotals.put(i, 0L);
-		    }
-		}
+		//for(int i = 0; i < partitionCount; ++i) {
+		//    if(partitionTotals.get(i) == null) {
+		//    	partitionTotals.put(i, 0L);
+		//    }
+		//}
 		
 		// copy partitionTotals into oldLoad
 		Map<Integer, Long> oldLoad = new HashMap<Integer, Long> ();
@@ -187,7 +187,7 @@ public class GreedyExtendedPlacement extends Placement {
 		if(!catalogContext.jarPath.getName().contains("tpcc")) {
 			aPlan = demoteTuples(hotTuplesListCopy, aPlan);
 		}
-		removeEmptyPartitions(aPlan);
+		//removeEmptyPartitions(aPlan);
 		//replaceEmptyPartitions(aPlan);
 		return aPlan;
 		

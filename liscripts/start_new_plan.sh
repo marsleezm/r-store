@@ -9,6 +9,8 @@ PlanFile=$2
 ./liscripts/copy_to_all.sh "`cat ./nodes`" $HostFile ~/r-store &
 ./liscripts/copy_to_all.sh "`cat ./clients`" $PlanFile ~/r-store &
 ./liscripts/copy_to_all.sh "`cat ./nodes`" $PlanFile ~/r-store &
+./liscripts/copy_to_all.sh "`cat ./clients`" ./properties/benchmarks/ycsb.properties ~/r-store/properties/benchmarks/ &
+./liscripts/copy_to_all.sh "`cat ./nodes`" ./properties/benchmarks/ycsb.properties ~/r-store/properties/benchmarks/ &
 wait
 
 ./liscripts/parallel_command.sh "`cat ./clients`" "cd r-store && ant hstore-prepare -Dproject=ycsb -Dhosts=$1" &
