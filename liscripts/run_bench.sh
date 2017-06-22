@@ -1,10 +1,12 @@
 #!/bin/bash
 
 Period=5
-Duration=900000
+Duration=700000
 ClientInt=$((Period*1000))
 OrgStatCnt=$((Duration / Period))
 OrgStatCnt=$((OrgStatCnt / 1000))
+CPUTHCnt=10
+CPUTH=65
 StatCnt=$((OrgStatCnt+10))
 echo $ClientInt
 echo $StatCnt
@@ -12,6 +14,8 @@ echo $StatCnt
 FirstNode=`head -1 ./nodes`
 #### Cleanup
 pkill -f ant
+pkill -f sar
+pkill -f monitor
 rm hotTuplesPID*
 rm siteLoadPID*
 ./liscripts/parallel_command.sh "`cat ./nodes`" "pkill -f java" &
@@ -29,12 +33,14 @@ HostFile="${plan/json/txt}"
 HostFile="${HostFile/plan/hosts}"
 echo $HostFile
 NumHosts=`cat $HostFile | wc -l`
+OrgHostNum=$((NumHosts-1))
 
 
 ### Make folder
 Date=`(date +'%Y%m%d-%H%M%S')`
 Folder="results/$Date"
 mkdir $Folder
+./liscripts/monitor_cpu.sh $Folder $Period 
 
 ### Load the data store
 ssh ubuntu@$FirstNode "cd r-store && ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnoshutdown=true -Dnoexecute=true -Dsite.txn_restart_limit_sysproc=100 -Dsite.jvm_asserts=false -Dsite.reconfig_live=true | tee load_log" 1>$Folder/load_output 2>&1 &
@@ -47,23 +53,24 @@ do
 done
 echo H-Store finished loading
 
-sleep 90 && ant elastic-controller -Dproject=ycsb -DtWindow=20 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts=";" | tee $Folder/planner1.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store && sleep 260 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts="+9;+10;+11" | tee $Folder/planner2.out &
+./liscripts/monitor_cpu.sh $Folder $Period 
+
+sleep 30 && ant elastic-controller -Dproject=ycsb -DtWindow=20 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts=";" | tee $Folder/planner1.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store && sleep 100 && ./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period $OrgHostNum $Folder & ./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period $OrgHostNum $Folder &
 #sleep 90 && ant elastic-controller -Dproject=ycsb -DtWindow=20 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts=";" | tee $Folder/planner.out &
 
-./liscripts/parallel_command.sh "`cat ./nodes`" "sar $Period $StatCnt > sar_out " &
 
-ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnostart=true -Dnoloader=true -Dnoshutdown=true -Dclient.txnrate=250 -Dclient.duration=$Duration -Dclient.interval=$ClientInt -Dclient.count=2 -Dclient.hosts="172.31.0.17;172.31.0.18" -Dclient.threads_per_host=4 -Dclient.blocking_concurrent=100 -Dclient.output_results_csv=$Folder/benchmark.csv -Dclient.output_interval=true
+ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnostart=true -Dnoloader=true -Dnoshutdown=true -Dclient.txnrate=200 -Dclient.duration=$Duration -Dclient.interval=$ClientInt -Dclient.count=2 -Dclient.hosts="172.31.0.17;172.31.0.18" -Dclient.threads_per_host=4 -Dclient.blocking_concurrent=100 -Dclient.output_results_csv=$Folder/benchmark.csv -Dclient.output_interval=true
 
-
+pkill -f sar
+ 
 # Gather cpu usage
-./liscripts/copy_from_all.sh "`cat ./nodes`" sar_out . $Folder
 ./liscripts/process_cpu.sh $Folder $OrgStatCnt 
 
 # Calculate when reconfig ended
 scp ubuntu@$FirstNode:~/r-store/reconfig_output $Folder
 F=$Folder/reconfig_output
-ReconfigStart=`head -1 $F | awk -F ':' '{print $2}'`
-ReconfigEnd=`tail -2 $F | head -1 | awk -F ':' '{print $2}'`
-echo $((ReconfigEnd-ReconfigStart)) >> $F
-echo $ReconfigStart >> $F
-echo $ReconfigEnd >> $F
+#ReconfigStart=`head -1 $F | awk -F ':' '{print $2}'`
+#ReconfigEnd=`tail -2 $F | head -1 | awk -F ':' '{print $2}'`
+#echo $((ReconfigEnd-ReconfigStart)) >> $F
+#echo $ReconfigStart >> $F
+#echo $ReconfigEnd >> $F

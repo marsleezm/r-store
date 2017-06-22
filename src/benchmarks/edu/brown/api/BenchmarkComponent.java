@@ -1289,8 +1289,8 @@ public abstract class BenchmarkComponent {
         			LOG.info("Thread " + Thread.currentThread() 
         					+ " modify load by factor of " + increment 
 //        					+ " for counter " + counter
-//        					+ " txn rate " + m_txnRate 
-        					+ " txn rate per millisecond " + m_txnsPerMillisecond);
+        					+ " txn rate " + m_txnRate); 
+//        					+ " txn rate per millisecond " + m_txnsPerMillisecond);
         			m_txnRate = (int) ((double) m_txnRate * increment);
         			m_txnsPerMillisecond = m_txnsPerMillisecond * increment;
         		}
