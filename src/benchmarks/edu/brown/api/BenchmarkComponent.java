@@ -1287,12 +1287,16 @@ public abstract class BenchmarkComponent {
         		double increment = Double.parseDouble(m_incrementsTxnRate.nextLine());
         		if (increment != 1){
         			LOG.info("Thread " + Thread.currentThread() 
-        					+ " modify load by factor of " + increment 
+//        					+ " modify load by factor of " + increment 
 //        					+ " for counter " + counter
-        					+ " txn rate " + m_txnRate); 
+//        					+ " txn rate " + m_txnRate); 
+							+" setting load from "+m_txnRate
+							+" to "+increment);
 //        					+ " txn rate per millisecond " + m_txnsPerMillisecond);
-        			m_txnRate = (int) ((double) m_txnRate * increment);
-        			m_txnsPerMillisecond = m_txnsPerMillisecond * increment;
+        			//m_txnRate = (int) ((double) m_txnRate * increment);
+        			//m_txnsPerMillisecond = m_txnsPerMillisecond * increment;
+        			m_txnRate = (int) increment;
+        			m_txnsPerMillisecond = increment/1000;
         		}
         	}
         	else{
