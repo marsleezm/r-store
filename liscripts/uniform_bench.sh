@@ -50,7 +50,7 @@ echo H-Store finished loading
 
 ./liscripts/monitor_cpu.sh $Folder $Period 
 
-./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period 2 $Folder "plan2_ycsb.json" &&  sleep 30 &&
+sleep 20 && ./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period 2 $Folder "plan2_ycsb.json" &&  sleep 30 &&
 ./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period 3 $Folder "plan3_ycsb.json" &&  sleep 30 &&
 ./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period 4 $Folder "plan4_ycsb.json" &&  sleep 30 &&
 ./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period 5 $Folder "plan5_ycsb.json" &&  sleep 30 &&
