@@ -1,13 +1,13 @@
 #!/bin/bash
 
 Period=5
-Duration=2700000
+Duration=1800000
 ClientInt=$((Period*1000))
 OrgStatCnt=$((Duration / Period))
 OrgStatCnt=$((OrgStatCnt / 1000))
 CPUTHCnt=6
 CPUTH=40
-LowCPUTH=30
+LowCPUTH=40
 StatCnt=$((OrgStatCnt+10))
 echo $ClientInt
 echo $StatCnt
@@ -55,9 +55,9 @@ echo H-Store finished loading
 
 ./liscripts/monitor_cpu.sh $Folder $Period 
 
-sleep 300 && ant elastic-controller -Dproject=ycsb -DtWindow=20 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts=";" | tee $Folder/planner1.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store &
-sleep 700 && ./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period $OrgHostNum $Folder &
-sleep 1800 && ./liscripts/monitor_and_scale_down.sh $LowCPUTH $CPUTHCnt $Period $OrgHostNum $Folder &
+#sleep 300 && ant elastic-controller -Dproject=ycsb -DtWindow=20 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts=";" | tee $Folder/planner1.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store &
+sleep 400 && ./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period $OrgHostNum $Folder &
+sleep 1000 && ./liscripts/monitor_and_scale_down.sh $LowCPUTH $CPUTHCnt $Period $OrgHostNum $Folder &
 
 #sleep 30 && ant elastic-controller -Dproject=ycsb -DtWindow=20 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts=";" | tee $Folder/planner1.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store && sleep 210 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=3 -DhighCPU=160 -DlowCPU=110 -DchangeParts="+9;+10;+11" | tee $Folder/controller_scale.out & 
 

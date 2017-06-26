@@ -100,15 +100,15 @@ public class Controller implements Runnable {
 			planFile = FileSystems.getDefault().getPath(hstore_conf.global.hasher_plan);
 		}
 
-		outputPlanFile = FileSystems.getDefault().getPath("plan_out.json");
+		//outputPlanFile = FileSystems.getDefault().getPath("plan_out.json");
 
-		try {
-			Files.copy(planFile, outputPlanFile, StandardCopyOption.REPLACE_EXISTING);				
-		}
-		catch(IOException e) {
-			System.out.println("Controller: IO Exception while copying plan file to output plan file");
-			e.printStackTrace();
-		}
+		//try {
+		//	Files.copy(planFile, outputPlanFile, StandardCopyOption.REPLACE_EXISTING);				
+		//}
+		//catch(IOException e) {
+		//	System.out.println("Controller: IO Exception while copying plan file to output plan file");
+		//	e.printStackTrace();
+		//}
 
 		switch (planner_selector) {
 		case 0:  algo = new GreedyPlacement(); System.out.println("GreedyPlacement is selected"); break;
@@ -169,7 +169,7 @@ public class Controller implements Runnable {
 
 			//ttExecutor.runTestCase(); 	
 			//System.out.println("Essam Before: hotTuplesList size is " + hotTuplesList.size());
-			System.out.println("Starting tuple tracking");	
+			//System.out.println("Starting tuple tracking");	
 
 			//ShellTools.cmd("./liscripts/remove_files.sh");
 			//ttExecutor.turnOnOff(time_window,client);	// turn on tuple tracking for time window of X seconds
@@ -177,15 +177,16 @@ public class Controller implements Runnable {
 			//ShellTools.cmd("./liscripts/gather_system_stats.sh");
 			
 			// here we get top K
-			ttExecutor.getTopKPerPart(no_of_partitions,hotTuplesList);
+			//ttExecutor.getTopKPerPart(no_of_partitions,hotTuplesList);
 
 			// here we get load per site
-			ttExecutor.getSiteLoadPerPart(no_of_partitions,mSiteLoad);
+			//ttExecutor.getSiteLoadPerPart(no_of_partitions,mSiteLoad);
 
 			System.out.println("Got list of hot tuples");	
 
 			// here we call the planner
 
+			/*
 			if(doProvisioning == 1)
 			{
 				System.out.println("Provisioning is on "+provisioning);	
@@ -209,11 +210,20 @@ public class Controller implements Runnable {
                 long after = System.currentTimeMillis();
                 System.out.println("The planner took " + (after-before) + " ms to find a new plan");
 			}
+			*/
 
 			System.out.println("Calculated new plan");
 
-			currentPlan.toJSON(outputPlanFile.toString());
-			String outputPlan = FileUtil.readFile(outputPlanFile.toString());
+			//currentPlan.toJSON(outputPlanFile.toString());
+			//String outputPlan = FileUtil.readFile(outputPlanFile.toString());
+			String outputPlan = "";
+			// I am trying to remove parts
+			if(to_add_parts.size() == 0 && to_remove_parts.size() != 0)
+				outputPlan = FileUtil.readFile(FileSystems.getDefault().getPath("plan_ycsb4_1empty.json").toString());
+			else if(to_add_parts.size() != 0 && to_remove_parts.size() == 0)
+				outputPlan = FileUtil.readFile(FileSystems.getDefault().getPath("plan_ycsb4.json").toString());
+			else
+				System.out.println("Wrong!");
 
 			ClientResponse cresponse = null;
 			try {
