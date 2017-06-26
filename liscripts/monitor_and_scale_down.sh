@@ -5,6 +5,7 @@ min_count=$2
 monitor_period=$3
 num_nodes=$4
 folder=$5
+plan=$6
 num_all_nodes=$((num_nodes + 1))
 
 
@@ -42,7 +43,7 @@ do
     if [ $cnt -ge $min_count ]
     then
 	echo "Decide to scale!" 
-	ant elastic-controller -Dproject=ycsb -DtWindow=2 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$((12 / num_all_nodes)) -DhighCPU=160 -DlowCPU=110 -DchangeParts="-9;-10;-11" | tee $folder/controller_scale_down.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json
+	ant elastic-controller -Dproject=ycsb -DtWindow=2 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$((12 / num_all_nodes)) -DhighCPU=160 -DlowCPU=110 -DchangeParts=$plan
         break
     fi
     sleep $monitor_period

@@ -5,9 +5,10 @@ Duration=1800000
 ClientInt=$((Period*1000))
 OrgStatCnt=$((Duration / Period))
 OrgStatCnt=$((OrgStatCnt / 1000))
-CPUTHCnt=6
-CPUTH=40
-LowCPUTH=40
+CPUTHCnt=20
+CPUTH=65
+CPUDownCnt=3
+LowCPUTH=65
 StatCnt=$((OrgStatCnt+10))
 echo $ClientInt
 echo $StatCnt
@@ -30,12 +31,6 @@ done
 wait
 
 plan=$1
-HostFile="${plan/json/txt}"
-HostFile="${HostFile/plan/hosts}"
-echo $HostFile
-NumHosts=`cat $HostFile | wc -l`
-OrgHostNum=$((NumHosts-1))
-
 
 ### Make folder
 Date=`(date +'%Y%m%d-%H%M%S')`
@@ -55,18 +50,14 @@ echo H-Store finished loading
 
 ./liscripts/monitor_cpu.sh $Folder $Period 
 
-#sleep 300 && ant elastic-controller -Dproject=ycsb -DtWindow=20 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts=";" | tee $Folder/planner1.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store &
-sleep 400 && ./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period $OrgHostNum $Folder &
-sleep 1000 && ./liscripts/monitor_and_scale_down.sh $LowCPUTH $CPUTHCnt $Period $OrgHostNum $Folder &
-
-#sleep 30 && ant elastic-controller -Dproject=ycsb -DtWindow=20 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts=";" | tee $Folder/planner1.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store && sleep 210 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=3 -DhighCPU=160 -DlowCPU=110 -DchangeParts="+9;+10;+11" | tee $Folder/controller_scale.out & 
-
-#sleep 30 && ant elastic-controller -Dproject=ycsb -DtWindow=20 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$NumHosts -DhighCPU=160 -DlowCPU=110 -DchangeParts=";" | tee $Folder/planner1.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store & 
-#sleep 330 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=3 -DhighCPU=160 -DlowCPU=110 -DchangeParts="+9;+10;+11" | tee $Folder/controller_scale.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store & 
-#sleep 700 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=3 -DhighCPU=160 -DlowCPU=110 -DchangeParts="-9;-10;-11" | tee $Folder/controller_scale_down.out & 
-
-#sleep 90 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=$plan -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=3 -DhighCPU=160 -DlowCPU=110 -DchangeParts="+9;+10;+11" | tee $Folder/controller_scale.out && cp plan_out.json next_round.json && ./liscripts/copy_to_all.sh "`cat ./nodes`" ./next_round.json ./r-store & 
-#sleep 450 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=3 -DhighCPU=160 -DlowCPU=110 -DchangeParts="-9;-10;-11" | tee $Folder/controller_scale_down.out & 
+./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period 2 $Folder "plan2_ycsb.json" &&  sleep 30 &&
+./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period 3 $Folder "plan3_ycsb.json" &&  sleep 30 &&
+./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period 4 $Folder "plan4_ycsb.json" &&  sleep 30 &&
+./liscripts/monitor_and_scale.sh $CPUTH $CPUTHCnt $Period 5 $Folder "plan5_ycsb.json" &&  sleep 30 &&
+./liscripts/monitor_and_scale_down.sh $CPUTH $CPUTHCnt $Period 6 $Folder "plan6_ycsb.json" && sleep 30 &&
+./liscripts/monitor_and_scale_down.sh $CPUTH $CPUTHCnt $Period 5 $Folder "plan7_ycsb.json" && sleep 30 &&
+./liscripts/monitor_and_scale_down.sh $CPUTH $CPUTHCnt $Period 4 $Folder "plan8_ycsb.json" && sleep 30 &&
+./liscripts/monitor_and_scale_down.sh $CPUTH $CPUTHCnt $Period 3 $Folder "plan9_ycsb.json" &
 
 
 ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnostart=true -Dnoloader=true -Dnoshutdown=true -Dclient.txnrate=100 -Dclient.duration=$Duration -Dclient.interval=$ClientInt -Dclient.count=2 -Dclient.hosts="172.31.0.17;172.31.0.18" -Dclient.threads_per_host=8 -Dclient.blocking_concurrent=100 -Dclient.output_results_csv=$Folder/benchmark.csv -Dclient.output_interval=true

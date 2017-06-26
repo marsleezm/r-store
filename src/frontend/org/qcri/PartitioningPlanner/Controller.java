@@ -75,8 +75,9 @@ public class Controller implements Runnable {
 	private static int partPerSite = 1;
 	private static double highCPU = 160;
 	private static double lowCPU = 110;
-	private static List<Integer> to_add_parts = new ArrayList<Integer>();
-	private static List<Integer> to_remove_parts = new ArrayList<Integer>();
+	private static String newPlan = "":
+	//private static List<Integer> to_add_parts = new ArrayList<Integer>();
+	//private static List<Integer> to_remove_parts = new ArrayList<Integer>();
 
 	// used HStoreTerminal as model to handle the catalog
 
@@ -218,12 +219,12 @@ public class Controller implements Runnable {
 			//String outputPlan = FileUtil.readFile(outputPlanFile.toString());
 			String outputPlan = "";
 			// I am trying to remove parts
-			if(to_add_parts.size() == 0 && to_remove_parts.size() != 0)
-				outputPlan = FileUtil.readFile(FileSystems.getDefault().getPath("plan_ycsb4_1empty.json").toString());
-			else if(to_add_parts.size() != 0 && to_remove_parts.size() == 0)
-				outputPlan = FileUtil.readFile(FileSystems.getDefault().getPath("plan_ycsb4.json").toString());
-			else
-				System.out.println("Wrong!");
+			//if(to_add_parts.size() == 0 && to_remove_parts.size() != 0)
+			outputPlan = FileUtil.readFile(FileSystems.getDefault().getPath(newPlan).toString());
+			//else if(to_add_parts.size() != 0 && to_remove_parts.size() == 0)
+			//	outputPlan = FileUtil.readFile(FileSystems.getDefault().getPath("plan_ycsb4.json").toString());
+			//else
+			//	System.out.println("Wrong!");
 
 			ClientResponse cresponse = null;
 			try {
@@ -307,15 +308,16 @@ public class Controller implements Runnable {
 			partPerSite = Integer.parseInt(vargs[8]);
 			highCPU = Double.parseDouble(vargs[9]);
 			lowCPU = Double.parseDouble(vargs[10]);
-			String[] to_change_parts = vargs[11].split(";");
-			for (String str : to_change_parts){
-				if(str.charAt(0) == '+')
-					to_add_parts.add(new Integer(str.substring(1)));
-				else
-					to_remove_parts.add(new Integer(str.substring(1)));
-			}
-			System.out.println("To add parts is "+to_add_parts);
-			System.out.println("To remove parts is "+to_remove_parts);
+			newPlan = vargs[11];
+			//String[] to_change_parts = vargs[11].split(";");
+			//for (String str : to_change_parts){
+			//	if(str.charAt(0) == '+')
+			//		to_add_parts.add(new Integer(str.substring(1)));
+			//	else
+			//		to_remove_parts.add(new Integer(str.substring(1)));
+			//}
+			System.out.println("New plan is "+newPlan);
+			//System.out.println("To remove parts is "+to_remove_parts);
 		}
 		else // use default
 		{
