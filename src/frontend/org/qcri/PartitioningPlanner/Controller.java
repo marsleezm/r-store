@@ -75,7 +75,7 @@ public class Controller implements Runnable {
 	private static int partPerSite = 1;
 	private static double highCPU = 160;
 	private static double lowCPU = 110;
-	private static String newPlan = "":
+	private static String newPlan = "";
 	//private static List<Integer> to_add_parts = new ArrayList<Integer>();
 	//private static List<Integer> to_remove_parts = new ArrayList<Integer>();
 
