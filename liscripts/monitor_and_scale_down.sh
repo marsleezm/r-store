@@ -7,6 +7,8 @@ num_nodes=$4
 folder=$5
 plan=$6
 num_all_nodes=$((num_nodes + 1))
+	ant elastic-controller -Dproject=ycsb -DtWindow=2 -DnumPart=12  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=$((12 / num_all_nodes)) -DhighCPU=160 -DlowCPU=110 -DchangeParts=$plan
+exit
 
 
 cnt=0

@@ -253,6 +253,7 @@ public class ReconfigurationCoordinator implements Shutdownable {
                 live_pull, hstore_conf.site.reconfig_async_chunk_size_kb, hstore_conf.site.reconfig_chunk_size_kb, 
                 FORCE_DESTINATION, hstore_conf.site.reconfig_async_delay_ms, hstore_conf.site.reconfig_subplan_split,
                 hstore_conf.site.reconfig_plan_delay);
+    	FileUtil.write(debugConfig);
         LOG.info(debugConfig);
         FileUtil.appendEventToFile(debugConfig);
         if(FORCE_DESTINATION){
