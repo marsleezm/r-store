@@ -109,7 +109,7 @@ class ControlWorker extends Thread {
             final long now = System.currentTimeMillis();
             final long delta = now - m_lastRequestTime;
             if (delta > 0) {
-                final int transactionsToCreate = (int) (delta * cmp.m_txnsPerMillisecond);
+                final int transactionsToCreate = (int) (delta * cmp.m_txnsPerMillisecond + 0.5);
                 if (transactionsToCreate < 1) {
                     Thread.sleep(25);
                     continue;

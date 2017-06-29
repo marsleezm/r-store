@@ -652,7 +652,7 @@ public abstract class BulkClient {
                 return;
             }
 
-            int txnsToCreate = (int)(delta * m_txnsPerMillisecond);
+            int txnsToCreate = (int)(delta * m_txnsPerMillisecond + 0.5);
             if (txnsToCreate < 1) {
                 return;
             }
