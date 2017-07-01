@@ -10,6 +10,8 @@ CPUTH=65
 DownCnt=20
 LowCPUTH=65
 StatCnt=$((OrgStatCnt+10))
+
+sleep 1 
 #echo $ClientInt
 #echo $StatCnt
 InitT=50
