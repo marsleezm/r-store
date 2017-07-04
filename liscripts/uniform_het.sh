@@ -19,8 +19,8 @@ S1=$((InitT+60*8-40))
 S2=$((InitT+60*10-30))
 S3=$((InitT+60*14-15))
 S4=$((InitT+60*16-15))
-S5=$((InitT+60*17-30))
-S6=$((InitT+60*24-15))
+S5=$((InitT+60*18-30))
+S6=$((InitT+60*22-15))
 S7=$((InitT+60*36-15))
 S8=$((InitT+60*38-15))
 S9=$((InitT+60*42-30))
@@ -95,7 +95,7 @@ echo Plan12 will sleep $S12 && sleep $S12 && ant elastic-controller -Dproject=yc
 
 
 #ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnostart=true -Dnoloader=true -Dnoshutdown=true -Dclient.txnrate=50 -Dclient.duration=$Duration -Dclient.interval=$ClientInt -Dclient.count=2 -Dclient.hosts="172.31.0.17;172.31.0.18" -Dclient.threads_per_host=16 -Dclient.blocking_concurrent=300 -Dclient.output_results_csv=$Folder/benchmark.csv -Dclient.output_interval=true
-ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnostart=true -Dnoloader=true -Dnoshutdown=true -Dclient.txnrate=50 -Dclient.duration=$Duration -Dclient.interval=$ClientInt -Dclient.count=5 -Dclient.hosts="172.31.0.17;172.31.0.18;172.31.0.3;172.31.0.4;172.31.0.5" -Dclient.threads_per_host=8 -Dclient.blocking=false -Dclient.output_results_csv=$Folder/benchmark.csv -Dclient.output_interval=true
+ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnostart=true -Dnoloader=true -Dnoshutdown=true -Dclient.txnrate=50 -Dclient.duration=$Duration -Dclient.interval=$ClientInt -Dclient.count=5 -Dclient.hosts="172.31.0.17;172.31.0.18;172.31.0.3;172.31.0.4;172.31.0.5" -Dclient.threads_per_host=8 -Dclient.blocking=false -Dclient.output_results_csv=$Folder/benchmark.csv -Dclient.output_interval=true | tee bench_out.txt
 
 pkill -f sar
  
