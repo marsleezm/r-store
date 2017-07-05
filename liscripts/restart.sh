@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if [ 1 == 2 ]
+then
 rm bench_out.txt
 ./liscripts/uniform_het.sh  ./plan1_het.json &
 pid=$!
@@ -19,8 +21,7 @@ while kill -0 "$pid" >/dev/null 2>&1; do
 	sleep 10
 done
 sleep 3
-exit
-
+fi
 
 
 rm bench_out.txt
@@ -39,6 +40,7 @@ while kill -0 "$pid" >/dev/null 2>&1; do
 	sleep 10
 done
 sleep 3
+exit
 
 rm bench_out.txt
 ./liscripts/proactive.sh ./plan1_ycsb5.json &
