@@ -1,0 +1,15 @@
+{
+  "partition_plan": {
+    "tables": {
+      "usertable": {
+        "partitions": {
+          "0": "0-600000",
+          "1": "600000-1200000",
+          "2": "",
+          "3": "",
+        }
+        }
+      }
+  },
+  "default_table": "usertable"
+}
