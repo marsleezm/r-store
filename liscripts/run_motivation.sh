@@ -1,5 +1,5 @@
 #!/bin/bash
 
 
-./liscripts/mot_proactive.sh
-./liscripts/mot_reactive.sh
+./liscripts/mot_proactive.sh plan1_mot.json
+#./liscripts/mot_reactive.sh plan1_mot.json

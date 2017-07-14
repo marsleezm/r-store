@@ -54,7 +54,7 @@ echo H-Store finished loading
 ./liscripts/monitor_cpu.sh $Folder $Period 
 
 InitT=40
-S1=$((InitT+17*60))
+S1=$((InitT+900))
 sleep $S1 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=plan1_mot.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan2_mot.json &
 
 
