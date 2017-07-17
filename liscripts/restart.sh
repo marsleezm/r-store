@@ -1,7 +1,6 @@
 #!/bin/bash
 
 rm bench_out.txt
-./liscripts/start_new_plan.sh hosts_het.txt ./plan1_het.json
 ./liscripts/uniform_het.sh  ./plan1_het.json &
 pid=$!
 while kill -0 "$pid" >/dev/null 2>&1; do
@@ -9,8 +8,10 @@ while kill -0 "$pid" >/dev/null 2>&1; do
 	then
 		echo "Aborted!!!!! Restart"
 		rm bench_out.txt
-		pkill -f proactive 
 		pkill -f uniform
+		pkill -f plan
+		pkill -f sar
+		pkill -f ant
 		./liscripts/uniform_het.sh ./plan1_het.json &
 		pid=$!
 	fi
