@@ -1,7 +1,7 @@
 #!/bin/bash
 
 Period=5
-Duration=1700000
+Duration=1850000
 ClientInt=$((Period*1000))
 OrgStatCnt=$((Duration / Period))
 OrgStatCnt=$((OrgStatCnt / 1000))

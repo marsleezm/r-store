@@ -1,7 +1,7 @@
 #!/bin/bash
 
 Period=5
-Duration=1500000
+Duration=1650000
 ClientInt=$((Period*1000))
 OrgStatCnt=$((Duration / Period))
 OrgStatCnt=$((OrgStatCnt / 1000))
@@ -14,13 +14,13 @@ StatCnt=$((OrgStatCnt+10))
 #echo $StatCnt
 InitT=50
 Pad=1700
-S6=$((InitT+60*24-15-1700))
-S7=$((InitT+60*36-15-1700))
-S8=$((InitT+60*38-15-1700))
-S9=$((InitT+60*42-30-1700))
-S10=$((InitT+60*44-30-1700))
-S11=$((InitT+60*46-30-1700))
-S12=$((InitT+60*52-30-1700))
+S6=$((InitT+60*24-15-1700+150))
+S7=$((InitT+60*36-15-1700+150))
+S8=$((InitT+60*38-15-1700+150))
+S9=$((InitT+60*42-30-1700+150))
+S10=$((InitT+60*44-30-1700+150))
+S11=$((InitT+60*46-30-1700+150))
+S12=$((InitT+60*52-30-1700+150))
 
 FirstNode=`head -1 ./nodes`
 #### Cleanup
