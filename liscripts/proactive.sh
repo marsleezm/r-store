@@ -38,7 +38,7 @@ Folder="results/$Date"
 mkdir $Folder
 
 ### Load the data store
-ssh ubuntu@$FirstNode "cd r-store && ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnoshutdown=true -Dnoexecute=true -Dsite.txn_restart_limit_sysproc=10000 -Dsite.jvm_asserts=false -Dsite.reconfig_live=true -Dsite.reconfig_async=true -Dsite.reconfig_async_pull=true | tee load_log" 1>$Folder/load_output 2>&1 &
+ssh ubuntu@$FirstNode "cd r-store && ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnoshutdown=true -Dnoexecute=true -Dsite.txn_restart_limit_sysproc=50000 -Dsite.jvm_asserts=false -Dsite.reconfig_live=true -Dsite.reconfig_async=true -Dsite.reconfig_async_pull=true | tee load_log" 1>$Folder/load_output 2>&1 &
 res=`grep "H-Store cluster remaining online until killed" $Folder/load_output`
 while [ "$res" == "" ]
 do 
@@ -62,16 +62,17 @@ echo H-Store finished loading
 #./liscripts/monitor_and_scale_down.sh $CPUTH $DownCnt $Period 4 $Folder "plan8_ycsb.json" && 
 #./liscripts/monitor_and_scale_down.sh $CPUTH $DownCnt $Period 3 $Folder "plan9_ycsb.json" &
 InitT=40
-S1=$((InitT+380-50))
-S2=$((InitT+900-40))
+S1=$((InitT+300-50))
+S2=$((InitT+850-40))
 S3=$((InitT+1000-50))
-S4=$((InitT+1250-40))
+S4=$((InitT+1240-40))
 S5=$((InitT+1550))
-S6=$((InitT+2170-40))
-S7=$((InitT+2260))
-S8=$((InitT+2300))
+S6=$((InitT+2100-40))
+S7=$((InitT+2290))
+S8=$((InitT+2340))
 S9=$((InitT+2430))
 S10=$((InitT+2900))
+
 sleep $S1 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan2_ycsb.json &
 sleep $S2 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan3_ycsb.json &
 sleep $S3 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan4_ycsb.json &
