@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if [ 1 == 2 ]
+then
 rm bench_out.txt
 ./liscripts/uniform_het.sh ./plan1_het.json &
 pid=$!
@@ -33,10 +35,7 @@ while kill -0 "$pid" >/dev/null 2>&1; do
 	fi
 	sleep 10
 done
-exit
 
-if [ 1 == 2 ]
-then
 rm bench_out.txt
 ./liscripts/reactive.sh ./plan1_ycsb.json &
 pid=$!
@@ -52,21 +51,6 @@ while kill -0 "$pid" >/dev/null 2>&1; do
 		rm bench_out.txt
 		./liscripts/reactive.sh ./plan1_ycsb.json &
 		pid=$!
-	else
-		res=`tail -80 bench_out.txt | grep "ms avg latency" | awk -F 'with ' '{print $2}' | awk -F ' ' '{print $1}'`
-		ff=($res)
-		if [ ${#ff[@]} -gt 1 ] && [ ${ff[0]} == ${ff[-1]} ] && [ ${ff[0]} == ${ff[1]} ]
-		then
-			echo "Aborted!!!!! Restart"
-			pkill -f reactive		
-			pkill -f uniform
-			pkill -f plan
-			pkill -f sar
-			pkill -f ant
-			rm bench_out.txt
-			./liscripts/reactive.sh ./plan1_ycsb.json &
-			pid=$!
-		fi
 	fi
 	sleep 10
 done
@@ -88,24 +72,10 @@ while kill -0 "$pid" >/dev/null 2>&1; do
 		rm bench_out.txt
 		./liscripts/proactive.sh ./plan1_ycsb.json &
 		pid=$!
-	else
-		res=`tail -80 bench_out.txt | grep "ms avg latency" | awk -F 'with ' '{print $2}' | awk -F ' ' '{print $1}'`
-		ff=($res)
-		if [ ${#ff[@]} -gt 1 ] && [ ${ff[0]} == ${ff[-1]} ] && [ ${ff[0]} == ${ff[1]} ]
-		then
-			echo "Aborted!!!!! Restart"
-			pkill -f reactive		
-			pkill -f uniform
-			pkill -f plan
-			pkill -f sar
-			pkill -f ant
-			rm bench_out.txt
-			./liscripts/proactive.sh ./plan1_ycsb.json &
-			pid=$!
-		fi
 	fi
 	sleep 10
 done
+exit
 
 while kill -0 "$pid" >/dev/null 2>&1; do
 	if tail -100 bench_out.txt | grep -q "with NaN ms avg latency" 
