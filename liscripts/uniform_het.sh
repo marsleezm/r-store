@@ -11,13 +11,14 @@ sleep 1
 #echo $ClientInt
 #echo $StatCnt
 InitT=50
-S1=$((InitT+60*9-50))
-S2=$((InitT+60*10-20))
-S3=$((InitT+60*14-30))
-S4=$((InitT+60*27))
-S5=$((InitT+60*30-30))
-S6=$((InitT+60*38))
-S7=$((InitT+60*42))
+S1=$((InitT+60*5-30))
+S2=$((InitT+60*10-40))
+S3=$((InitT+60*13-30))
+S4=$((InitT+60*30))
+S5=$((InitT+60*38))
+S6=$((InitT+60*41))
+S7=$((InitT+60*43))
+S8=$((InitT+60*49))
 #S12=$((InitT+60*52-30))
 
 FirstNode=`head -1 ./nodes`
@@ -68,10 +69,11 @@ echo Plan4 will sleep $S4 && sleep $S4 && ant elastic-controller -Dproject=ycsb 
 echo Plan5 will sleep $S5 && sleep $S5 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan6_het.json  &
 echo Plan6 will sleep $S6 && sleep $S6 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan7_het.json  &
 echo Plan7 will sleep $S7 && sleep $S7 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan8_het.json  &
+echo Plan8 will sleep $S8 && sleep $S8 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan9_het.json  &
 
 
 #ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnostart=true -Dnoloader=true -Dnoshutdown=true -Dclient.txnrate=50 -Dclient.duration=$Duration -Dclient.interval=$ClientInt -Dclient.count=2 -Dclient.hosts="172.31.0.17;172.31.0.18" -Dclient.threads_per_host=16 -Dclient.blocking_concurrent=300 -Dclient.output_results_csv=$Folder/benchmark.csv -Dclient.output_interval=true
-ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnostart=true -Dnoloader=true -Dnoshutdown=true -Dclient.txnrate=50 -Dclient.duration=$Duration -Dclient.interval=$ClientInt -Dclient.count=5 -Dclient.hosts="172.31.0.17;172.31.0.3;172.31.0.7;172.31.0.5;172.31.0.6" -Dclient.threads_per_host=8 -Dclient.blocking=false -Dclient.output_results_csv=$Folder/benchmark.csv -Dclient.output_interval=true | tee bench_out.txt
+ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnostart=true -Dnoloader=true -Dnoshutdown=true -Dclient.txnrate=50 -Dclient.duration=$Duration -Dclient.interval=$ClientInt -Dclient.count=5 -Dclient.hosts="172.31.0.2;172.31.0.3;172.31.0.4;172.31.0.5;172.31.0.13" -Dclient.threads_per_host=8 -Dclient.blocking=false -Dclient.output_results_csv=$Folder/benchmark.csv -Dclient.output_interval=true | tee bench_out.txt
 
 pkill -f sar
  

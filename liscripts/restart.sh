@@ -1,7 +1,5 @@
 #!/bin/bash
 
-if [ 1 == 2 ]
-then
 rm bench_out.txt
 ./liscripts/uniform_het.sh ./plan1_het.json &
 pid=$!
@@ -17,24 +15,10 @@ while kill -0 "$pid" >/dev/null 2>&1; do
 		rm bench_out.txt
 		./liscripts/uniform_het.sh ./plan1_het.json &
 		pid=$!
-	#else
-		#res=`tail -200 bench_out.txt | grep "Latencies 99" | awk -F 'Latencies 99: ' '{print $2}' | awk -F '(' '{print $1}'`
-		#ff=($res)
-		#if [ ${#ff[@]} -gt 2 ] && [ ${ff[0]} == ${ff[1]} ] && [ ${ff[1]} == ${ff[2]} ]
-		#then
-	#		echo "Aborted!!!!! Restart"
-	#		pkill -f reactive		
-#			pkill -f uniform
-#			pkill -f plan
-#			pkill -f sar
-#			pkill -f ant
-#			rm bench_out.txt
-#			./liscripts/uniform_het.sh ./plan1_het.json &
-#			pid=$!
-#		fi
 	fi
 	sleep 10
 done
+exit
 
 rm bench_out.txt
 ./liscripts/reactive.sh ./plan1_ycsb.json &
