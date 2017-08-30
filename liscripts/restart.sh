@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm bench_out.txt
-./liscripts/uniform_het.sh ./plan1_het.json &
+./liscripts/vadara_het.sh ./plan1_vad.json &
 pid=$!
 while kill -0 "$pid" >/dev/null 2>&1; do
 	if tail -100 bench_out.txt | grep -q "with NaN ms avg latency" 
@@ -12,8 +12,10 @@ while kill -0 "$pid" >/dev/null 2>&1; do
 		pkill -f plan
 		pkill -f sar
 		pkill -f ant
+		pkill -f vad 
 		rm bench_out.txt
-		./liscripts/uniform_het.sh ./plan1_het.json &
+		#./liscripts/uniform_het.sh ./plan1_het.json &
+		./liscripts/vadara_het.sh ./plan1_vad.json &
 		pid=$!
 	fi
 	sleep 10
