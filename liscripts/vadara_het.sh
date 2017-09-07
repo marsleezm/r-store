@@ -11,23 +11,23 @@ sleep 1
 #echo $ClientInt
 #echo $StatCnt
 InitT=50
-A1=$((InitT+60*2-30))
-A2=$((InitT+60*6-40))
-A3=$((InitT+60*8-30))
-A4=$((InitT+60*10-30))
-A5=$((InitT+60*12-30))
-A6=$((InitT+60*18-30))
-A7=$((InitT+60*26-30))
-A8=$((InitT+60*30-30))
+A1=$((InitT+60*1-30))
+A2=$((InitT+60*3-40))
+A3=$((InitT+60*5-30))
+A4=$((InitT+60*7-30))
+A5=$((InitT+60*9-30))
+A6=$((InitT+60*15-30))
+A7=$((InitT+60*23-30))
+A8=$((InitT+60*27-30))
 
 
-R1=$((InitT+60*22))
-R2=$((InitT+60*24))
-R3=$((InitT+60*32))
-R4=$((InitT+60*34))
-R5=$((InitT+60*36))
-R6=$((InitT+60*38))
-R7=$((InitT+60*39))
+R1=$((InitT+60*19))
+R2=$((InitT+60*21))
+R3=$((InitT+60*29))
+R4=$((InitT+60*31))
+R5=$((InitT+60*33))
+R6=$((InitT+60*35))
+R7=$((InitT+60*37))
 
 FirstNode=`head -1 ./nodes`
 #### Cleanup
