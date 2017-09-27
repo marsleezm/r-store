@@ -1,7 +1,7 @@
 #!/bin/bash
 
 Period=5
-Duration=2400000
+Duration=1400000
 ClientInt=$((Period*1000))
 OrgStatCnt=$((Duration / Period))
 OrgStatCnt=$((OrgStatCnt / 1000))
@@ -11,23 +11,18 @@ sleep 1
 #echo $ClientInt
 #echo $StatCnt
 InitT=50
-A1=$((InitT+60*1-30))
-A2=$((InitT+60*3-40))
-A3=$((InitT+60*5-30))
-A4=$((InitT+60*7-30))
-A5=$((InitT+60*9-30))
-A6=$((InitT+60*15-30))
-A7=$((InitT+60*23-30))
-A8=$((InitT+60*27-30))
+Red=1000
+A7=$((InitT+60*23-30-Red))
+A8=$((InitT+60*27-30-Red))
 
 
-R1=$((InitT+60*19))
-R2=$((InitT+60*21))
-R3=$((InitT+60*29))
-R4=$((InitT+60*31))
-R5=$((InitT+60*33))
-R6=$((InitT+60*35))
-R7=$((InitT+60*37))
+R1=$((InitT+60*19-Red))
+R2=$((InitT+60*21-Red))
+R3=$((InitT+60*29-Red))
+R4=$((InitT+60*31-Red))
+R5=$((InitT+60*33-Red))
+R6=$((InitT+60*35-Red))
+R7=$((InitT+60*37-Red))
 
 FirstNode=`head -1 ./nodes`
 #### Cleanup
@@ -58,35 +53,18 @@ Folder="results/$Date"
 mkdir $Folder
 
 ### Load the data store
-TotalWait=0
-ssh ubuntu@$FirstNode "cd r-store && timeout 3600 ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnoshutdown=true -Dnoexecute=true -Dsite.txn_restart_limit_sysproc=20000 -Dsite.jvm_asserts=false -Dsite.reconfig_live=true -Dsite.reconfig_async=true -Dsite.reconfig_async_pull=true | tee load_log" 1>$Folder/load_output 2>&1 &
-pid=$!	
+ssh ubuntu@$FirstNode "cd r-store && ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnoshutdown=true -Dnoexecute=true -Dsite.txn_restart_limit_sysproc=20000 -Dsite.jvm_asserts=false -Dsite.reconfig_live=true -Dsite.reconfig_async=true -Dsite.reconfig_async_pull=true | tee load_log" 1>$Folder/load_output 2>&1 &
 res=`grep "H-Store cluster remaining online until killed" $Folder/load_output`
 while [ "$res" == "" ]
 do 
     echo "Wait for H-Store to finish loading"
     sleep 5 
-	TotalWait=$((TotalWait+5))
-	if [ "$TotalWait" -gt "200" ]
-	then
-		kill $pid
-		TotalWait=0
-		echo "Restarted!!!"
-		ssh ubuntu@$FirstNode "cd r-store && timeout 3600 ant hstore-benchmark -Dproject=ycsb -Dglobal.hasher_plan=$plan -Dglobal.hasher_class=edu.brown.hashing.TwoTieredRangeHasher -Dnoshutdown=true -Dnoexecute=true -Dsite.txn_restart_limit_sysproc=20000 -Dsite.jvm_asserts=false -Dsite.reconfig_live=true -Dsite.reconfig_async=true -Dsite.reconfig_async_pull=true | tee load_log" 1>$Folder/load_output 2>&1 &
-		pid=$!	
-	fi
     res=`grep "H-Store cluster remaining online until killed" $Folder/load_output`
 done
 echo H-Store finished loading
 
 ./liscripts/monitor_cpu.sh $Folder $Period 
 
-echo Plan1 will sleep $A1 && sleep $A1 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan2_vad.json  &
-echo Plan2 will sleep $A2 && sleep $A2 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan3_vad.json  &
-echo Plan3 will sleep $A3 && sleep $A3 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan4_vad.json  &
-echo Plan4 will sleep $A4 && sleep $A4 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan5_vad.json  &
-echo Plan5 will sleep $A5 && sleep $A5 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan6_vad.json  &
-echo Plan6 will sleep $A6 && sleep $A6 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan7_vad.json  &
 echo Plan6 will sleep $R1 && sleep $R1 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan8_vad.json  &
 echo Plan6 will sleep $R2 && sleep $R2 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan9_vad.json  &
 echo Plan7 will sleep $A7 && sleep $A7 && ant elastic-controller -Dproject=ycsb -DtWindow=15 -DnumPart=10  -DplannerID=1 -Dprovisioning=0 -DtimeLimit=5000 -Dglobal.hasher_plan=next_round.json -Dmonitoring=0 -DsitesPerHost=1 -DpartPerSite=2 -DhighCPU=160 -DlowCPU=110 -DchangeParts=plan10_vad.json  &

@@ -1,13 +1,18 @@
 #!/bin/bash
 
 rm bench_out.txt
+#cp ./txnrates1.txt ./txnrates.txt
+#./liscripts/start_new_plan.sh ./hosts_vad.txt ./plan1_vad.json
 ./liscripts/vadara_het.sh ./plan1_vad.json &
 pid=$!
 while kill -0 "$pid" >/dev/null 2>&1; do
+	if tail -200 bench_out.txt | head -100 | grep -q "with NaN ms avg latency" 
+	then
 	if tail -100 bench_out.txt | grep -q "with NaN ms avg latency" 
 	then
 		echo "Aborted!!!!! Restart"
 		pkill -f reactive		
+		pkill -f sleep 
 		pkill -f uniform
 		pkill -f plan
 		pkill -f sar
@@ -16,6 +21,32 @@ while kill -0 "$pid" >/dev/null 2>&1; do
 		rm bench_out.txt
 		#./liscripts/uniform_het.sh ./plan1_het.json &
 		./liscripts/vadara_het.sh ./plan1_vad.json &
+		pid=$!
+	fi
+	fi
+	sleep 10
+done
+exit
+
+cp ./txnrates2.txt ./txnrates.txt
+./liscripts/start_new_plan.sh ./hosts_vad.txt ./plan7_vad.json
+rm bench_out.txt
+./liscripts/vadara_het2.sh ./plan1_vad.json &
+pid=$!
+while kill -0 "$pid" >/dev/null 2>&1; do
+	if tail -100 bench_out.txt | grep -q "with NaN ms avg latency" 
+	then
+		echo "Aborted!!!!! Restart"
+		pkill -f reactive		
+		pkill -f uniform
+		pkill -f sleep 
+		pkill -f plan
+		pkill -f sar
+		pkill -f ant
+		pkill -f vad 
+		rm bench_out.txt
+		#./liscripts/uniform_het.sh ./plan1_het.json &
+		./liscripts/vadara_het2.sh ./plan1_vad.json &
 		pid=$!
 	fi
 	sleep 10
